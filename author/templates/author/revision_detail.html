@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>
+	{{revision.title}} 
+	{% if revision.revision_number %}(Revision {{revision.revision_number}}){% endif %}
+</h1>
+<p>by {{revision.manuscript.author_names}}</p>
+<p>{{revision.status_message}}</p>
+<form 
+	method="post" 
+	action="{% url 'show_revision' revision.manuscript_id revision.revision_number %}"
+>
+  {% csrf_token %}
+	{% if revision.can_submit %}
+	  <input type="submit" name="action" value="Submit">
+	{% endif %}
+	{% if revision.can_withdraw %}
+	  <input type="submit" name="action" value="Withdraw">
+	{% endif %}
+	{% if revision.can_create_new_revision %}
+	  <input type="submit" name="action" value="Create a new revision">
+	{% endif %}
+</form>
+<hr>
+{{revision.text|safe}}
+{% endblock %}

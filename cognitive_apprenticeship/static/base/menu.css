@@ -1,0 +1,18 @@
+#menu {
+ background-color: grey;
+ display: flex;
+}
+.menu-left {
+	flex: 1;
+	display: flex;
+}
+.menu-right {
+	display: flex;
+}
+.menu-item {
+	padding: 10px;
+}
+#menu a {
+	color: white;
+	text-decoration: none;
+}

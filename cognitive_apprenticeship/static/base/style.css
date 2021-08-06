@@ -1,0 +1,32 @@
+body {
+	font-family: Helvetica;
+	margin: 0;
+}
+#page-wrapper {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+}
+#container {
+	flex: 1;
+	padding: 0 20px;
+}
+#footer {
+  background-color: grey;
+	display: flex;
+}
+#footer a {
+	color: white;
+	text-decoration: none;
+}
+.footer-item {
+	padding:10px;
+}
+.message {
+	margin: 10px 0;
+	padding: 10px;
+	border: 1px solid black;
+	border-radius: 5px;
+	background-color: #ddd;
+}
+

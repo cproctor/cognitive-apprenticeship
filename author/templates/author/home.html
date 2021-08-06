@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Author</h1>
+
+{% if request.user.manuscripts %}
+  <p>Your manuscripts</p>
+  {% for manuscript in manuscripts %}
+		{% include "author/manuscript_summary.html" %}
+	{% endfor %}
+{% else %}
+	<p>You have no manuscripts.<p>
+{% endif %}
+<p><a href="{% url 'new_manuscript' %}">Submit a new manuscript</a></p>
+{% endblock %}

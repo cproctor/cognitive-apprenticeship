@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>LAI 615 Journal</h1>
+{% if articles %}
+<p>ARTICLES!</p>
+{% else %}
+	<p>No articles have been published yet in this journal.
+{% endif %}
+
+{% endblock %}

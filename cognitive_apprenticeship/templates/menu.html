@@ -1,0 +1,21 @@
+<nav id="menu">
+	<div class="menu-left">
+		<div class="menu-item"><a href="{% url 'home_page' %}">Home</a></div>
+		{% if user.is_authenticated %}
+		  {% if user.profile.is_author %}
+		    <div class="menu-item"><a href="{% url 'author_home' %}">Author</a></div>
+			{% endif %}
+		  {% if user.profile.is_reviewer %}
+		    <div class="menu-item"><a href="{% url 'reviewer_home' %}">Reviewer</a></div>
+			{% endif %}
+		{% endif %}
+	</div>
+	<div class="menu-right">
+		{% if user.is_authenticated %}
+		  <div class="menu-item">Logged in as {{user.username}}</div>
+		  <div class="menu-item"><a href="{% url 'logout' %}">Log out</a></div>
+		{% else %}
+		  <div class="menu-item"><a href="{% url 'login' %}">Log in</a></div>
+		{% endif %}
+	</div>
+</nav>

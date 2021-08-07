@@ -2,6 +2,11 @@
 
 {% block content %}
 <h1>Manuscripts</h1>
+<form method="get" action="{% url 'list_editor_manuscripts' %}">
+  <input type="text" name="q">
+  <input type="submit" value="Search by username">
+</form>
+<hr>
 <div class="editor-manuscripts">
 	<div class="editor-manuscripts-col">
 		<div class="cell cell-header">Unsubmitted</div>

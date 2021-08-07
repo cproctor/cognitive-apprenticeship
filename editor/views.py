@@ -29,7 +29,7 @@ class ListEditorManuscripts(EditorRoleRequiredMixin, TemplateView):
         published = []
         # Here add kwarg
         if 'q' in self.request.GET:
-            manuscripts = Manuscript.objects.filter(author__username=self.request.GET['q'])
+            manuscripts = Manuscript.objects.filter(authors__username=self.request.GET['q'])
         else: 
             manuscripts = Manuscript.objects.all()
 

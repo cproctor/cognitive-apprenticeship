@@ -1,0 +1,30 @@
+{% extends "editor/base.html" %}
+
+{% block content %}
+<h1>Manuscripts</h1>
+<div class="editor-manuscripts">
+	<div class="editor-manuscripts-col">
+		<div class="cell cell-header">Unsubmitted</div>
+		{% for manuscript in unsubmitted_manuscripts %}
+		  {% include "editor/manuscript_cell.html" %}
+		{% endfor %}
+	</div><div class="editor-manuscripts-col">
+		<div class="cell cell-header">Pending</div>
+		{% for manuscript in pending_manuscripts %}
+		  {% include "editor/manuscript_cell.html" %}
+		{% endfor %}
+	</div><div class="editor-manuscripts-col">
+		<div class="cell cell-header">Decided</div>
+		{% for manuscript in decided_manuscripts %}
+		  {% include "editor/manuscript_cell.html" %}
+		{% endfor %}
+	</div><div class="editor-manuscripts-col">
+		<div class="cell cell-header">Published</div>
+		{% for manuscript in published_manuscripts %}
+		  {% include "editor/manuscript_cell.html" %}
+		{% endfor %}
+	</div>
+</div>
+{% endblock %}
+
+

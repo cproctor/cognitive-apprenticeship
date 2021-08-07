@@ -23,4 +23,5 @@ urlpatterns = [
     path('tinymce/', include('tinymce.urls')),
     path('author/', include('author.urls')),
     path('reviewer/', include('reviewer.urls')),
+    path('editor/', include('editor.urls')),
 ]

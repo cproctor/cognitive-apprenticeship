@@ -16,3 +16,12 @@
 	color: white;
 	text-decoration: none;
 }
+
+#submenu {
+  background-color: #bbb;
+	display: flex;
+}
+#submenu a {
+	color: white;
+	text-decoration: none;
+}

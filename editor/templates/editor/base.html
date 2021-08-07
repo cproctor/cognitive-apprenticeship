@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'editor_style.css' %}">
+{% endblock %}
+
+{% block submenu %}
+  {% include "editor/submenu.html" %}
+{% endblock %}

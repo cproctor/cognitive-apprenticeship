@@ -8,6 +8,9 @@
 		  {% if user.profile.is_reviewer %}
 		    <div class="menu-item"><a href="{% url 'reviewer_home' %}">Reviewer</a></div>
 			{% endif %}
+		  {% if user.profile.is_editor %}
+		    <div class="menu-item"><a href="{% url 'editor_home' %}">Editor</a></div>
+			{% endif %}
 		{% endif %}
 	</div>
 	<div class="menu-right">

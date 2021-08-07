@@ -11,6 +11,8 @@
   <body>
   <div id="page-wrapper">
     {% include "menu.html" %}
+    {% block submenu %}
+    {% endblock %}
     <div id="container">
       {% if messages %}
         {% for message in messages %}

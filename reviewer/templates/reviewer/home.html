@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Reviewer</h1>
+
+<h2>Assigned reviews</h2>
+{% if reviews_assigned %}
+  {% for review in reviews_assigned %}
+		{% include "author/review_summary.html" %}
+	{% endfor %}
+{% else %}
+	<p>You have no assigned reviews.<p>
+{% endif %}
+
+<h2>Closed reviews</h2>
+{% if reviews_closed %}
+  {% for review in reviews_closed %}
+		{% include "author/review_summary.html" %}
+	{% endfor %}
+{% else %}
+	<p>You have no closed reviews.<p>
+{% endif %}
+{% endblock %}
+

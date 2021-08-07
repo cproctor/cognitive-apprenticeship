@@ -126,12 +126,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / "static_root"
 STATICFILES_DIRS = [
     BASE_DIR / 'cognitive_apprenticeship' / 'static',
 ]
 TINYMCE_JS_URL = STATIC_URL + "/js/tinymce/tinymce.min.js"
-TINYMCE_JS_ROOT = BASE_DIR / "author" / "static" / "js" / "tinymce"
-TINYMCE_COMPRESSOR = False
+#TINYMCE_JS_ROOT = str(STATIC_ROOT / "js" / "tinymce")
+#TINYMCE_COMPRESSOR = False
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -140,3 +141,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGOUT_REDIRECT_URL = '/'
 
+JOURNAL_NAME = "LAI 615 Journal"

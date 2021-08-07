@@ -30,3 +30,6 @@ body {
 	background-color: #ddd;
 }
 
+form.actions {
+  display: inline;
+}

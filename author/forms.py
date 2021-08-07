@@ -20,3 +20,11 @@ class NewManuscriptForm(forms.Form):
     class Meta:
         model = Revision
         fields = ['title', 'text']
+
+class EditRevisionForm(forms.ModelForm):
+    title = forms.CharField(max_length=200)
+    text = forms.CharField(widget=TinyMCE())
+
+    class Meta:
+        model = Revision
+        fields = ['title', 'text']

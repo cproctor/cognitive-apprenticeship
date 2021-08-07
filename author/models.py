@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
@@ -66,7 +67,7 @@ class Revision(models.Model):
             default=StatusChoices.PENDING)
 
     def get_absolute_url(self):
-        return reverse('show_revision', self.manuscript_id, self.revision_number)
+        return reverse('show_revision', args=[self.manuscript_id, self.revision_number])
 
     def status_message(self):
         if self.status in (self.StatusChoices.UNSUBMITTED, self.StatusChoices.WAITING_FOR_AUTHORS):

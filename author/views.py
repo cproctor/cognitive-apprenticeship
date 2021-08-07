@@ -9,7 +9,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.contrib import messages
 from .models import Manuscript, ManuscriptAuthorship, Revision
-from .forms import NewManuscriptForm
+from .forms import NewManuscriptForm, EditRevisionForm
 
 class AuthorRoleRequiredMixin:
     def dispatch(self, request, *args, **kwargs):
@@ -78,11 +78,7 @@ class ShowManuscript(AuthorRoleRequiredMixin, DetailView):
             return redirect('show_revision', m.id, m.revisions.last().revision_number)
         return super().get(request, *args, **kwargs)
 
-class ShowRevision(AuthorRoleRequiredMixin, DetailView):
-    http_method_names = ['get', 'post']
-    model = Revision
-    context_object_name = "revision"
-
+class GetRevisionObjectMixin:
     def get_object(self, queryset=None):
         qs = queryset or self.get_queryset()
         try:
@@ -94,6 +90,11 @@ class ShowRevision(AuthorRoleRequiredMixin, DetailView):
         except Revision.DoesNotExist:
             raise Http404("No such revision")
 
+class ShowRevision(AuthorRoleRequiredMixin, GetRevisionObjectMixin, DetailView):
+    http_method_names = ['get', 'post']
+    model = Revision
+    context_object_name = "revision"
+
     def post(self, request, *args, **kwargs):
         revision = self.get_object()
         action = request.POST['action'].upper()
@@ -103,6 +104,7 @@ class ShowRevision(AuthorRoleRequiredMixin, DetailView):
                     revision.status = revision.StatusChoices.PENDING
                     revision.date_submitted = datetime.now()
                     revision.save()
+                    message = "Your manuscript has been submitted. You will be notified once reviewers provide feedback."
                 else:
                     raise ActionNotAllowed("submit")
             elif action == "WITHDRAW":
@@ -110,31 +112,37 @@ class ShowRevision(AuthorRoleRequiredMixin, DetailView):
                     revision.status = revision.StatusChoices.WITHDRAWN
                     revision.date_decided = datetime.now()
                     revision.save()
+                    message = "Your manuscript has been withdrawn and will not be reviewed."
                 else:
                     raise ActionNotAllowed("withdraw")
             elif action == "CREATE A NEW REVISION":
                 if revision.can_create_new_revision():
                     new_revision = revision.create_new_revision()
+                    message = "You have created a new revision."
+                    messages.add_message(request, messages.INFO, message)
                     return redirect('show_revision', manuscript_pk=revision.manuscript_id,
                             revision_number=new_revision.revision_number)
                 else:
                     raise ActionNotAllowed("new revision")
             else:
                 return HttpResponseForbidden("Unrecognized action")
+
+            # On success
+            messages.add_message(request, messages.WARNING, message)
             return redirect('show_revision', manuscript_pk=revision.manuscript_id,
                 revision_number=revision.revision_number)
+
         except ActionNotAllowed as e:
             messages.add_message(request, messages.WARNING, str(e))
             return HttpResponseForbidden(str(e))
 
-class EditRevision(AuthorRoleRequiredMixin, UpdateView):
+class EditRevision(AuthorRoleRequiredMixin, GetRevisionObjectMixin, UpdateView):
     model = Revision
-    form_class = NewManuscriptForm
+    form_class = EditRevisionForm
     template_name = "author/edit_revision.html"
 
-    def get_form(self):
-        return NewManuscriptForm(current_user=self.request.user)
-
+    def get_success_url(self):
+        return revers
 
 class ActionNotAllowed(Exception):
     def __init__(self, action):

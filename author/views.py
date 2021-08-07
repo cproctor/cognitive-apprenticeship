@@ -1,9 +1,10 @@
 from datetime import datetime
 from django.db import transaction, DatabaseError
+from django.http import HttpResponseForbidden
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, FormView
+from django.views.generic.edit import CreateView, UpdateView, FormView
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.contrib import messages
@@ -78,6 +79,7 @@ class ShowManuscript(AuthorRoleRequiredMixin, DetailView):
         return super().get(request, *args, **kwargs)
 
 class ShowRevision(AuthorRoleRequiredMixin, DetailView):
+    http_method_names = ['get', 'post']
     model = Revision
     context_object_name = "revision"
 
@@ -91,5 +93,56 @@ class ShowRevision(AuthorRoleRequiredMixin, DetailView):
             return qs.get()
         except Revision.DoesNotExist:
             raise Http404("No such revision")
+
+    def post(self, request, *args, **kwargs):
+        revision = self.get_object()
+        action = request.POST['action'].upper()
+        try:
+            if action == "SUBMIT":
+                if revision.can_submit():
+                    revision.status = revision.StatusChoices.PENDING
+                    revision.date_submitted = datetime.now()
+                    revision.save()
+                else:
+                    raise ActionNotAllowed("submit")
+            elif action == "WITHDRAW":
+                if revision.can_withdraw():
+                    revision.status = revision.StatusChoices.WITHDRAWN
+                    revision.date_decided = datetime.now()
+                    revision.save()
+                else:
+                    raise ActionNotAllowed("withdraw")
+            elif action == "CREATE A NEW REVISION":
+                if revision.can_create_new_revision():
+                    new_revision = revision.create_new_revision()
+                    return redirect('show_revision', manuscript_pk=revision.manuscript_id,
+                            revision_number=new_revision.revision_number)
+                else:
+                    raise ActionNotAllowed("new revision")
+            else:
+                return HttpResponseForbidden("Unrecognized action")
+            return redirect('show_revision', manuscript_pk=revision.manuscript_id,
+                revision_number=revision.revision_number)
+        except ActionNotAllowed as e:
+            messages.add_message(request, messages.WARNING, str(e))
+            return HttpResponseForbidden(str(e))
+
+class EditRevision(AuthorRoleRequiredMixin, UpdateView):
+    model = Revision
+    form_class = NewManuscriptForm
+    template_name = "author/edit_revision.html"
+
+    def get_form(self):
+        return NewManuscriptForm(current_user=self.request.user)
+
+
+class ActionNotAllowed(Exception):
+    def __init__(self, action):
+        super().__init__("Action {} not allowed")
+
+
+
+
+
 
 

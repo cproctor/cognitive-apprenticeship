@@ -3,5 +3,7 @@
 {% block content %}
 <h1>{{manuscript.revisions.last.title}}</h1>
 <p>{{manuscript.author_names}}</p>
-<p><a href="{% url 'author_home' %}">Back to author home</a></p>
+{% for revision in manuscript.revisions.all %}
+  {% include "author/revision_summary.html" %}
+{% endfor %}
 {% endblock%}

@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.urls import reverse
 from tinymce.models import HTMLField
 from common.models import NondeletedManager
 
@@ -11,6 +12,9 @@ class Manuscript(models.Model):
 
     objects = NondeletedManager()
 
+    def get_absolute_url(self):
+        return reverse('show_manuscript', self.id)
+
     def has_unacknowledged_authors(self):
         return self.authors.filter(manuscriptauthorship__acknowledged=False).exists()
 
@@ -19,11 +23,15 @@ class Manuscript(models.Model):
         return self.revisions.last().title
 
     def author_names(self):
-        authors = ["{} {}".format(a.first_name, a.last_name) for a in self.authors.all()]
+        return self.format_author_names(self.authors.all())
+
+    def format_author_names(self, users):
+        authors = ["{} {}".format(u.first_name, u.last_name) for u in users]
         if len(authors) == 1:
             return authors[0]
         else:
             return ', '.join(authors[:-1]) + 'and ' + authors[-1]
+
 
 class ManuscriptAuthorship(models.Model):
     manuscript = models.ForeignKey(Manuscript, on_delete=models.CASCADE)
@@ -57,9 +65,12 @@ class Revision(models.Model):
     status = models.CharField(max_length=20, choices=StatusChoices.choices,
             default=StatusChoices.PENDING)
 
+    def get_absolute_url(self):
+        return reverse('show_revision', self.manuscript_id, self.revision_number)
+
     def status_message(self):
         if self.status in (self.StatusChoices.UNSUBMITTED, self.StatusChoices.WAITING_FOR_AUTHORS):
-            verb = "created".format(self.date_created.strftime(self.timeformat))
+            verb = "created"
             ts = self.date_created
         elif self.status == self.StatusChoices.WITHDRAWN:
             verb = "withdrawn"
@@ -75,16 +86,41 @@ class Revision(models.Model):
             ts = self.date_decided
         return "{} ({} {})".format(self.status, verb, ts.strftime(self.timeformat))
 
+    def create_new_revision(self):
+        if self.manuscript.has_unacknowledged_authors():
+            status = Revision.StatusChoices.WAITING_FOR_AUTHORS
+        else:
+            status = Revision.StatusChoices.UNSUBMITTED
+        return self.manuscript.revisions.create(
+            title=self.title,
+            text=self.text,
+            revision_number=self.revision_number + 1,
+            date_created=datetime.now(),
+            status=status,
+        )
+
     def can_submit(self):
         return self.status == self.StatusChoices.UNSUBMITTED
+
     def can_withdraw(self):
         return self.status == self.StatusChoices.PENDING
+
     def can_create_new_revision(self):
-        return self.status in [
+        valid_statuses = [
             self.StatusChoices.WITHDRAWN,
             self.StatusChoices.MINOR_REVISION,
             self.StatusChoices.MAJOR_REVISION,
         ]
+        later_revisions = self.manuscript.revisions.filter(revision_number__gt=self.revision_number)
+        return self.status in valid_statuses and not later_revisions.exists()
+
+    def can_edit(self):
+        valid_statuses = [
+            self.StatusChoices.UNSUBMITTED,
+            self.StatusChoices.WAITING_FOR_AUTHORS,
+        ]
+        return self.status in valid_statuses
+
 
 
 

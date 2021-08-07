@@ -6,12 +6,17 @@
 	{% if revision.revision_number %}(Revision {{revision.revision_number}}){% endif %}
 </h1>
 <p>by {{revision.manuscript.author_names}}</p>
-<p>{{revision.status_message}}</p>
+<p>Status: {{revision.status_message}}</p>
 <form 
 	method="post" 
 	action="{% url 'show_revision' revision.manuscript_id revision.revision_number %}"
 >
   {% csrf_token %}
+  	{% if revision.can_edit %}
+	  <a href="{% url 'edit_revision' revision.manuscript_id revision.revision_number %}">
+	  <button>Edit</button>
+	  </a>
+	{% endif %}
 	{% if revision.can_submit %}
 	  <input type="submit" name="action" value="Submit">
 	{% endif %}

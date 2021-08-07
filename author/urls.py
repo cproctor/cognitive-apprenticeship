@@ -8,4 +8,6 @@ urlpatterns = [
     path('manuscripts/<int:pk>', views.ShowManuscript.as_view(), name='show_manuscript'),
     path('manuscripts/<int:manuscript_pk>/versions/<int:revision_number>', 
             views.ShowRevision.as_view(), name='show_revision'),
+    path('manuscripts/<int:manuscript_pk>/versions/<int:revision_number>/edit', 
+            views.EditRevision.as_view(), name='edit_revision'),
 ]

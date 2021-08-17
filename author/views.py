@@ -72,6 +72,9 @@ class NewManuscript(AuthorRoleRequiredMixin, FormView):
 class ShowManuscript(AuthorRoleRequiredMixin, DetailView):
     model = Manuscript
 
+    def get_queryset(self):
+        return super().get_queryset().filter(authors=self.request.user)
+
     def get(self, request, *args, **kwargs):
         m = self.get_object()
         if m.revisions.count() == 1:
@@ -79,7 +82,11 @@ class ShowManuscript(AuthorRoleRequiredMixin, DetailView):
         return super().get(request, *args, **kwargs)
 
 class GetRevisionObjectMixin:
+    """A mixin which overrides `get_object` to look up a revision nested within
+    a manuscript.
+    """
     def get_object(self, queryset=None):
+        "Looks up a revision by manuscript id and revision_number."
         qs = queryset or self.get_queryset()
         try:
             qs = Revision.objects.filter(
@@ -142,7 +149,9 @@ class EditRevision(AuthorRoleRequiredMixin, GetRevisionObjectMixin, UpdateView):
     template_name = "author/edit_revision.html"
 
     def get_success_url(self):
-        return revers
+        revision = self.get_object()
+        return reverse('show_revision', args=(revision.manuscript_id, 
+                revision.revision_number))
 
 class ActionNotAllowed(Exception):
     def __init__(self, action):

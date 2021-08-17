@@ -6,7 +6,7 @@
 <h2>Assigned reviews</h2>
 {% if reviews_assigned %}
   {% for review in reviews_assigned %}
-		{% include "author/review_summary.html" %}
+		{% include "reviewer/review_summary.html" %}
 	{% endfor %}
 {% else %}
 	<p>You have no assigned reviews.<p>

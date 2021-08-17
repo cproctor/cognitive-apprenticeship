@@ -1,11 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+class ReviewManager(models.Manager):
+    def for_manuscript(self, manuscript):
+        return self.get_queryset().filter(revision__manuscript=manuscript)
+
 class Review(models.Model):
     class StatusChoices(models.TextChoices):
         ASSIGNED = 'ASSIGNED', 'Assigned'
         COMPLETE = 'COMPLETE', 'Complete'
         EXPIRED = 'EXPIRED', 'Expired'
+        WITHDRAWN = 'WITHDRAWN', 'Manuscript was withdrawn'
     class RecommendationChoices(models.TextChoices):
         ACCEPT = 'ACCEPT', 'Accept'
         MINOR_REVISION = 'MINOR', 'Minor revision'
@@ -19,7 +24,9 @@ class Review(models.Model):
     recommendation = models.CharField(max_length=20,
             choices=RecommendationChoices.choices, null=True)
     date_due = models.DateTimeField()
-    date_submitted = models.DateTimeField()
+    date_submitted = models.DateTimeField(null=True)
+
+    objects = ReviewManager()
 
 class ManuscriptReviewer(models.Model):
     manuscript = models.ForeignKey('author.Manuscript', on_delete=models.CASCADE)

@@ -4,6 +4,22 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from tinymce.models import HTMLField
 from common.models import NondeletedManager
+from django.db.models import Q, Count
+
+class ManuscriptQuerySet(models.QuerySet):
+    def count_reviews(self, name, **kwargs):
+        "Annotates the query with a count of reviews, optionally filtered."
+        filter_kwargs = {'revisions__reviews__' + k : v for k, v in kwargs.items()}
+        agg = Count('revisions__reviews', filter=Q(**filter_kwargs))
+        return self.annotate(**{name: agg})
+
+class ManuscriptManager(models.Manager):
+    "A manager which uses ManuscriptQuerySet and which filters out deleted"
+    def get_queryset(self):
+        return ManuscriptQuerySet(self.model, using=self._db).filter(deleted=False)
+
+    def count_reviews(self, name, **kwargs):
+        return self.get_queryset().count_reviews(name, **kwargs)
 
 class Manuscript(models.Model):
     authors = models.ManyToManyField(User, through="author.ManuscriptAuthorship", related_name="manuscripts")
@@ -11,13 +27,17 @@ class Manuscript(models.Model):
             related_name="reviewed_manuscripts")
     deleted = models.BooleanField(default=False)
 
-    objects = NondeletedManager()
+    objects = ManuscriptManager()
 
     def get_absolute_url(self):
         return reverse('show_manuscript', self.id)
 
     def has_unacknowledged_authors(self):
         return self.authors.filter(manuscriptauthorship__acknowledged=False).exists()
+
+    def can_assign_reviewer(self):
+        "Whether it is possible to assign a reviewer to this manuscript"
+        return self.revisions.last().status == Revision.StatusChoices.PENDING
 
     def short_title(self):
         "Someday will appropriately shorten the title"
@@ -33,6 +53,8 @@ class Manuscript(models.Model):
         else:
             return ', '.join(authors[:-1]) + 'and ' + authors[-1]
 
+    def status_message(self):
+        return self.revisions.last().status_message()
 
 class ManuscriptAuthorship(models.Model):
     manuscript = models.ForeignKey(Manuscript, on_delete=models.CASCADE)

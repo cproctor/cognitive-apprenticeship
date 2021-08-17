@@ -143,3 +143,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGOUT_REDIRECT_URL = '/'
 
 JOURNAL_NAME = "LAI 615 Journal"
+DAYS_TO_REVIEW = 7

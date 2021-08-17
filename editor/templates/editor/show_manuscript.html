@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{manuscript.revisions.last.title}}</h1>
+<p>{{manuscript.author_names}}</p>
+<p>{{manuscript.status_message}}</p>
+<p>{{manuscript.revisions.count}} revisions</p>
+<h2>Reviewers</h2>
+{% if manuscript.reviewers.count %}
+  <ul>
+  {% for reviewer in manuscript.reviewers.all %}
+    <li>
+      {{reviewer}}
+      <form method="post" action="{% url 'show_editor_manuscript' manuscript.id %}"> 
+      {% csrf_token %}
+      <input type="hidden" name="username" value="{{reviewer}}">
+      <input type="hidden" name="action" value="remove_reviewer">
+      <input type="submit" value="Remove">
+  </form>
+    </li>	
+  {% endfor %}
+  </ul>
+{% else %}
+<p>No reviewers are assigned to this manuscript</p>
+{% endif %}
+{% if manuscript.can_assign_reviewer %}
+  {% if assign_reviewer_form.num_possible_reviewers %}
+  <form method="post" action="{% url 'show_editor_manuscript' manuscript.id %}">
+	{% csrf_token %}
+	{{ assign_reviewer_form }}
+	<input type="hidden" name="action" value="assign_reviewer">
+	<input type="submit" value="Assign reviewer">
+  </form>
+  {% else %}
+  <p>Can't assign additional reviewers; there are no eligible users.</p>
+  {% endif %}
+{% endif %}
+<hr>
+{{manuscript.revisions.last.text|safe}}
+{% endblock%}
+

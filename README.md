@@ -1,7 +1,8 @@
 TODO
 
+- Alter models such that Manuscript has Reviewers through Reviews.
+
 - Create fixture with fake students
-- Build out reviewer models and views
 - Built out editor views
 - Build out editor submenu
   - Manuscripts (kanban-style flowchart)
@@ -29,3 +30,9 @@ TODO
   About page. TinyMCE can be the editor. https://django-tinymce.readthedocs.io/en/latest/usage.html
 
 - Email templates
+
+## Documentation
+
+- Reviewers are assigned to manuscripts, as they stay with manuscripts
+  throughout the review process. This may include feedback on multiple
+  revisions. 

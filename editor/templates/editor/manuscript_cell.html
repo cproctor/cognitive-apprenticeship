@@ -1,6 +1,13 @@
 <article class="manuscript manuscript-cell {{manuscript.revisions.last.status}}">
-	<p class="manuscript-title"><a href="{% url 'show_manuscript' manuscript.id %}">{{manuscript.revisions.last.title}}</a></p>
+	<p class="manuscript-title"><a href="{% url 'show_editor_manuscript' manuscript.id %}">{{manuscript.short_title}}</a></p>
   <p>{{manuscript.author_names}}</p>
-	<p>{{manuscript.revisions.last.status_message}}</p>
+	<p>{{manuscript.status_message}}</p>
+	<p>
+		{% if manuscript.num_reviews %}
+			{{manuscript.num_complete_reviews}}/{{manuscript.num_reviews}} reviews complete.
+		{% else %}
+			No reviewers assigned.
+		{% endif %}
+	</p>
 </article>
 

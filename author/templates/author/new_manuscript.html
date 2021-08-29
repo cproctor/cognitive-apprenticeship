@@ -7,7 +7,7 @@
 {% block content %}
 <h1>New Manuscript</h1>
 
-<form method="post" action="{% url 'new_manuscript' %}">
+<form method="post" action="{% url 'author:new_manuscript' %}">
   {% csrf_token %}
 	{{ form.as_p }}
 	<input type="submit" value="Save">

@@ -18,24 +18,6 @@
       <p>by {{manuscript.author_names}}</p>
       <div class="manuscript-actions">
         {% block manuscript_actions %}
-          {% if revision.can_edit %}
-          <a href="{% url 'author:edit_revision' revision.manuscript_id revision.revision_number %}">
-            <button>Edit</button>
-          </a>
-          {% endif %}
-          <form class="actions" method="post" 
-             action="{% url 'author:show_revision' revision.manuscript_id revision.revision_number %}">
-            {% csrf_token %}
-            {% if revision.can_submit %}
-              <input type="submit" name="action" value="Submit">
-            {% endif %}
-            {% if revision.can_withdraw %}
-              <input type="submit" name="action" value="Withdraw">
-            {% endif %}
-            {% if revision.can_create_new_revision %}
-              <input type="submit" name="action" value="Create a new revision">
-            {% endif %}
-          </form>
         {% endblock %}
       </div>
       {% endblock %}

@@ -1,5 +1,5 @@
 <article class="manuscript">
-	<h2><a href="{% url 'show_manuscript' manuscript.id %}">{{manuscript.revisions.last.title}}</a></h2>
+	<h2><a href="{% url 'author:show_manuscript' manuscript.id %}">{{manuscript.revisions.last.title}}</a></h2>
   <p>{{manuscript.author_names}}</p>
 	<p>{{manuscript.revisions.last.status_message}}</p>
 </article>

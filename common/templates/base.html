@@ -13,7 +13,7 @@
     {% include "menu.html" %}
     {% block submenu %}
     {% endblock %}
-    <div id="container">
+    <div id="main-content">
       {% if messages %}
         {% for message in messages %}
         <div class="message {% if message.tags %}{{ message.tags }}{% endif %}">

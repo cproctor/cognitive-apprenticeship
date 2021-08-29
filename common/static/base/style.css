@@ -7,9 +7,8 @@ body {
 	flex-direction: column;
 	height: 100vh;
 }
-#container {
+#main-content {
 	flex: 1;
-	padding: 0 20px;
 }
 #footer {
   background-color: grey;
@@ -32,4 +31,36 @@ body {
 
 form.actions {
   display: inline;
+}
+article.revision.current {
+	background-color: #eee;
+}
+article.revision {
+	padding: 8px;
+}
+
+#manuscript-layout {
+  display: flex;
+	align-items: stretch;
+	height: 100%;
+}
+.manuscript-sidebar {
+	background-color: #ddd;
+	width: 200px;
+}
+.manuscript-content {
+  flex: 1 1;
+}
+.manuscript-header {
+  padding: 12px;
+}
+.manuscript-text {
+  padding: 12px;
+}
+.revision-form-title {
+  padding: 0 12px 12px 0;
+}
+.revision-form-title input {
+  width: 100%;
+  font-size: 3em;
 }

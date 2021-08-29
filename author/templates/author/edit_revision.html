@@ -5,10 +5,6 @@
 {% endblock %}
 
 {% block content %}
-<form method="post" action="{% url 'edit_revision' revision.manuscript_id revision.revision_number %}">
-  {% csrf_token %}
-	{{ form.as_p }}
-	<input type="submit" value="Save">
-</form>
+  {% include "author/partials/manuscript_revision_edit.html" %}
 {% endblock %}
 

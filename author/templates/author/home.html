@@ -6,7 +6,7 @@
 {% if request.user.manuscripts %}
   <p>Your manuscripts</p>
   {% for manuscript in manuscripts %}
-		{% include "author/manuscript_summary.html" %}
+		{% include "author/partials/manuscript_summary.html" %}
 	{% endfor %}
 {% else %}
 	<p>You have no manuscripts.<p>

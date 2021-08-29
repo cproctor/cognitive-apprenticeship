@@ -1,9 +1,13 @@
-<article class="revision">
-	<h2>
-		<a href="{% url 'show_revision' revision.manuscript_id revision.revision_number %}">
+<article class="revision {% if current_revision == revision %}current{% endif %}">
+	<h3>
+		{% if current_revision == revision %}
+		  {{revision.title}} (Revision {{revision.revision_number}})
+		{% else %}
+		<a href="{% url 'author:show_revision' revision.manuscript_id revision.revision_number %}">
 			{{revision.title}}
 		  (Revision {{revision.revision_number}})
 		</a> 
-	</h2>
+		{% endif %}
+	</h3>
 	<p>{{revision.status_message}}</p>
 </article>

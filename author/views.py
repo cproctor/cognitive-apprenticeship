@@ -80,6 +80,7 @@ class ShowManuscript(AuthorMixin, DetailView):
 class ShowRevision(AuthorMixin, ManuscriptRevisionMixin, DetailView):
     http_method_names = ['get', 'post']
     model = Revision
+    template_name = "author/manuscript_revision.html"
 
     def post(self, request, *args, **kwargs):
         revision = self.get_object()

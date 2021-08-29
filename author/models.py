@@ -30,7 +30,7 @@ class Manuscript(models.Model):
     objects = ManuscriptManager()
 
     def get_absolute_url(self):
-        return reverse('show_manuscript', self.id)
+        return reverse('author:show_manuscript', self.id)
 
     def has_unacknowledged_authors(self):
         return self.authors.filter(manuscriptauthorship__acknowledged=False).exists()
@@ -51,7 +51,7 @@ class Manuscript(models.Model):
         if len(authors) == 1:
             return authors[0]
         else:
-            return ', '.join(authors[:-1]) + 'and ' + authors[-1]
+            return ', '.join(authors[:-1]) + ' and ' + authors[-1]
 
     def status_message(self):
         return self.revisions.last().status_message()
@@ -110,7 +110,7 @@ class Revision(models.Model):
             default=StatusChoices.PENDING)
 
     def get_absolute_url(self):
-        return reverse('show_revision', args=[self.manuscript_id, self.revision_number])
+        return reverse('author:show_revision', args=[self.manuscript_id, self.revision_number])
 
     def status_message(self):
         if self.status in (self.StatusChoices.UNSUBMITTED, self.StatusChoices.WAITING_FOR_AUTHORS):

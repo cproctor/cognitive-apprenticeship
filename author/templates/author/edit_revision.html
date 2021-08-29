@@ -1,10 +1,31 @@
-{% extends "author/base.html" %}
+{% extends "author/manuscript_revision.html" %}
 
 {% block head %}
   {{ form.media }}
 {% endblock %}
 
-{% block content %}
-  {% include "author/partials/manuscript_revision_edit.html" %}
+{% block manuscript_text %}
+<form method="post" action="{% url 'author:edit_revision' revision.manuscript_id revision.revision_number %}">
+  {{ form.non_field_errors }}
+  <div class="revision-form-title">
+    {{form.title}}
+  </div>
+  {% csrf_token %}
+	<input type="submit" value="Save">
+  <a href="{% url 'author:show_revision' revision.manuscript_id revision.revision_number %}">
+    <button type="button">Cancel</button>
+  </a>
+  <hr>
+  {{form.text}}
+</form>
+{% endblock %}
+
+{% block manuscript_header %}
+{% endblock %}
+
+{% block manuscript_actions %}
+{% endblock %}
+
+{% block manuscript_divider %}
 {% endblock %}
 

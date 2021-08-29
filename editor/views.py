@@ -90,14 +90,14 @@ class ShowEditorManuscript(EditorRoleRequiredMixin, DetailView):
                         status=Review.StatusChoices.ASSIGNED,
                         date_due=datetime.now() + timedelta(days=settings.DAYS_TO_REVIEW)
                     )
-                return redirect('show_editor_manuscript', manuscript.id)
+                return redirect('editor:show_manuscript', manuscript.id)
             else:
                 context['assign_reviewer_form'] = form
                 return render(request, self.template_name, context)
         elif action.upper() == 'REMOVE_REVIEWER':
             user = manuscript.reviewers.get(username=request.POST['username'])
             manuscript.reviewers.remove(user)
-            return redirect('show_editor_manuscript', manuscript.id)
+            return redirect('editor:show_manuscript', manuscript.id)
 
             
 

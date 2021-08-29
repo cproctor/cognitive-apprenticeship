@@ -1,5 +1,7 @@
-<article class="manuscript manuscript-cell {{manuscript.revisions.last.status}}">
-	<p class="manuscript-title"><a href="{% url 'show_editor_manuscript' manuscript.id %}">{{manuscript.short_title}}</a></p>
+<article class="process-chart-cell {{manuscript.revisions.last.status}}">
+  <p class="title">
+     <a href="{% url 'editor:show_manuscript' manuscript.id %}">{{manuscript.short_title}}</a>
+  </p>
   <p>{{manuscript.author_names}}</p>
 	<p>{{manuscript.status_message}}</p>
 	<p>

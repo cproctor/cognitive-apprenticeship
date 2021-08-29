@@ -11,7 +11,7 @@
   {% for reviewer in manuscript.reviewers.all %}
     <li>
       {{reviewer}}
-      <form method="post" action="{% url 'show_editor_manuscript' manuscript.id %}"> 
+      <form method="post" action="{% url 'editor:show_manuscript' manuscript.id %}"> 
       {% csrf_token %}
       <input type="hidden" name="username" value="{{reviewer}}">
       <input type="hidden" name="action" value="remove_reviewer">
@@ -25,7 +25,7 @@
 {% endif %}
 {% if manuscript.can_assign_reviewer %}
   {% if assign_reviewer_form.num_possible_reviewers %}
-  <form method="post" action="{% url 'show_editor_manuscript' manuscript.id %}">
+  <form method="post" action="{% url 'editor:show_manuscript' manuscript.id %}">
 	{% csrf_token %}
 	{{ assign_reviewer_form }}
 	<input type="hidden" name="action" value="assign_reviewer">

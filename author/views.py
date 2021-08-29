@@ -10,20 +10,12 @@ from django.urls import reverse
 from django.contrib import messages
 from .models import Manuscript, ManuscriptAuthorship, Revision
 from .forms import NewManuscriptForm, EditRevisionForm
+from .mixins import (
+    AuthorMixin,
+    ManuscriptRevisionMixin,
+)
 
-class AuthorRoleRequiredMixin:
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            msg = "You must be logged in to view authors pages."
-            messages.add_message(request, messages.WARNING, msg)
-            return redirect('home_page')
-        if not request.user.profile.is_author:
-            msg = "You are not registered as an author."
-            messages.add_message(request, messages.WARNING, msg)
-            return redirect('home_page')
-        return super().dispatch(request, *args, **kwargs)
-
-class AuthorHome(AuthorRoleRequiredMixin, TemplateView):
+class AuthorHome(AuthorMixin, TemplateView):
     template_name = "author/home.html"
     
     def get_context_data(self):
@@ -31,7 +23,7 @@ class AuthorHome(AuthorRoleRequiredMixin, TemplateView):
             'manuscripts': Manuscript.objects.filter(authors=self.request.user),
         }
 
-class NewManuscript(AuthorRoleRequiredMixin, FormView):
+class NewManuscript(AuthorMixin, FormView):
     form_class = NewManuscriptForm
     template_name = "author/new_manuscript.html"
 
@@ -62,45 +54,28 @@ class NewManuscript(AuthorRoleRequiredMixin, FormView):
                         date_created=datetime.now(),
                         status=status,
                     )
-                return redirect('show_revision', manuscript_pk=manuscript.id,
+                return redirect('author:show_revision', manuscript_pk=manuscript.id,
                         revision_number=revision.revision_number)
             except DatabaseError:
                 return render(request, self.template_name, {'form': form})
         else:
             return render(request, self.template_name, {'form': form})
 
-class ShowManuscript(AuthorRoleRequiredMixin, DetailView):
+class ShowManuscript(AuthorMixin, DetailView):
+    """Redirects to show the manuscript's last revision.
+    """
     model = Manuscript
 
     def get_queryset(self):
-        return super().get_queryset().filter(authors=self.request.user)
+        return Manuscript.objects.filter(authors=self.request.user)
 
     def get(self, request, *args, **kwargs):
         m = self.get_object()
-        if m.revisions.count() == 1:
-            return redirect('show_revision', m.id, m.revisions.last().revision_number)
-        return super().get(request, *args, **kwargs)
+        return redirect('author:show_revision', m.id, m.revisions.last().revision_number)
 
-class GetRevisionObjectMixin:
-    """A mixin which overrides `get_object` to look up a revision nested within
-    a manuscript.
-    """
-    def get_object(self, queryset=None):
-        "Looks up a revision by manuscript id and revision_number."
-        qs = queryset or self.get_queryset()
-        try:
-            qs = Revision.objects.filter(
-                manuscript__id=self.kwargs['manuscript_pk'],
-                revision_number=self.kwargs['revision_number']
-            )
-            return qs.get()
-        except Revision.DoesNotExist:
-            raise Http404("No such revision")
-
-class ShowRevision(AuthorRoleRequiredMixin, GetRevisionObjectMixin, DetailView):
+class ShowRevision(AuthorMixin, ManuscriptRevisionMixin, DetailView):
     http_method_names = ['get', 'post']
     model = Revision
-    context_object_name = "revision"
 
     def post(self, request, *args, **kwargs):
         revision = self.get_object()
@@ -108,58 +83,72 @@ class ShowRevision(AuthorRoleRequiredMixin, GetRevisionObjectMixin, DetailView):
         try:
             if action == "SUBMIT":
                 if revision.can_submit():
-                    revision.status = revision.StatusChoices.PENDING
-                    revision.date_submitted = datetime.now()
-                    revision.save()
-                    message = "Your manuscript has been submitted. You will be notified once reviewers provide feedback."
+                    return self.submit_revision()
                 else:
                     raise ActionNotAllowed("submit")
             elif action == "WITHDRAW":
                 if revision.can_withdraw():
-                    revision.status = revision.StatusChoices.WITHDRAWN
-                    revision.date_decided = datetime.now()
-                    revision.save()
-                    message = "Your manuscript has been withdrawn and will not be reviewed."
+                    return self.withdraw_revision()
                 else:
                     raise ActionNotAllowed("withdraw")
             elif action == "CREATE A NEW REVISION":
                 if revision.can_create_new_revision():
-                    new_revision = revision.create_new_revision()
-                    message = "You have created a new revision."
-                    messages.add_message(request, messages.INFO, message)
-                    return redirect('show_revision', manuscript_pk=revision.manuscript_id,
-                            revision_number=new_revision.revision_number)
+                    return self.create_new_revision()
                 else:
                     raise ActionNotAllowed("new revision")
             else:
                 return HttpResponseForbidden("Unrecognized action")
-
-            # On success
-            messages.add_message(request, messages.WARNING, message)
-            return redirect('show_revision', manuscript_pk=revision.manuscript_id,
-                revision_number=revision.revision_number)
-
         except ActionNotAllowed as e:
             messages.add_message(request, messages.WARNING, str(e))
             return HttpResponseForbidden(str(e))
 
-class EditRevision(AuthorRoleRequiredMixin, GetRevisionObjectMixin, UpdateView):
+    def submit_revision(self):
+        revision = self.get_object()
+        revision.status = revision.StatusChoices.PENDING
+        revision.date_submitted = datetime.now()
+        revision.save()
+        message = "Your manuscript has been submitted. You will be notified once reviewers provide feedback."
+        messages.add_message(self.request, messages.INFO, message)
+        return redirect(
+            'author:show_revision', 
+            manuscript_pk=revision.manuscript_id,
+            revision_number=revision.revision_number
+        )
+
+    def withdraw_revision(self):
+        revision = self.get_object()
+        revision.status = revision.StatusChoices.WITHDRAWN
+        revision.date_decided = datetime.now()
+        revision.save()
+        message = "Your manuscript has been withdrawn and will not be reviewed."
+        messages.add_message(self.request, messages.INFO, message)
+        return redirect(
+            'author:show_revision', 
+            manuscript_pk=revision.manuscript_id,
+            revision_number=revision.revision_number
+        )
+
+    def create_new_revision(self):
+        revision = self.get_object()
+        new_revision = revision.create_new_revision()
+        message = "You have created a new revision."
+        messages.add_message(self.request, messages.INFO, message)
+        return redirect(
+            'author:show_revision', 
+            manuscript_pk=revision.manuscript_id,
+            revision_number=new_revision.revision_number
+        )
+
+class EditRevision(AuthorMixin, ManuscriptRevisionMixin, UpdateView):
     model = Revision
     form_class = EditRevisionForm
     template_name = "author/edit_revision.html"
 
     def get_success_url(self):
         revision = self.get_object()
-        return reverse('show_revision', args=(revision.manuscript_id, 
+        return reverse('author:show_revision', args=(revision.manuscript_id, 
                 revision.revision_number))
 
 class ActionNotAllowed(Exception):
     def __init__(self, action):
         super().__init__("Action {} not allowed")
-
-
-
-
-
-
-

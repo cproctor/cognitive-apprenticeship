@@ -107,7 +107,7 @@ class Revision(models.Model):
         else:
             verb = "decision received"
             ts = self.date_decided
-        return "{} ({} {})".format(self.status, verb, ts.strftime(self.timeformat))
+        return "{} {}".format(verb.capitalize(), ts.strftime(self.timeformat))
 
     def create_new_revision(self):
         if self.manuscript.has_unacknowledged_authors():

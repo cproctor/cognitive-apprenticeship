@@ -56,6 +56,27 @@ class Manuscript(models.Model):
     def status_message(self):
         return self.revisions.last().status_message()
 
+    def process_stage(self):
+        """Manuscripts go through the following process stages:
+          - In preparation
+          - In submission
+          - Decided
+          - Published or in press
+        """
+        process_stages = {
+            Revision.StatusChoices.UNSUBMITTED:         "in preparation",
+            Revision.StatusChoices.WAITING_FOR_AUTHORS: "in preparation",
+            Revision.StatusChoices.WITHDRAWN:           "in preparation",
+            Revision.StatusChoices.PENDING:             "in submission",
+            Revision.StatusChoices.ACCEPT:              "published",
+            Revision.StatusChoices.MINOR_REVISION:      "decided",
+            Revision.StatusChoices.MAJOR_REVISION:      "decided",
+            Revision.StatusChoices.REJECT:              "decided",
+            Revision.StatusChoices.PUBLISHED:           "published",
+        }
+        last_revision_status = self.revisions.last().status
+        return process_stages[last_revision_status]
+
 class ManuscriptAuthorship(models.Model):
     manuscript = models.ForeignKey(Manuscript, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.CASCADE)

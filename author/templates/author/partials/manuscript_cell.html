@@ -1,0 +1,8 @@
+<article class="process-chart-cell">
+  <p class="title">
+    <a href="{% url 'author:show_manuscript' manuscript.id %}">{{manuscript.revisions.last.title}}</a>
+  </p>
+  <p>{{manuscript.author_names}}</p>
+	<p class="manuscript-status">{{manuscript.revisions.last.status_message}}</p>
+</article>
+

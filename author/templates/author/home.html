@@ -1,15 +1,37 @@
 {% extends "author/base.html" %}
 
 {% block content %}
-<h1>Author</h1>
+<h1>Your manuscripts</h1>
 
-{% if request.user.manuscripts %}
-  <p>Your manuscripts</p>
-  {% for manuscript in manuscripts %}
-		{% include "author/partials/manuscript_summary.html" %}
-	{% endfor %}
-{% else %}
-	<p>You have no manuscripts.<p>
-{% endif %}
-<p><a href="{% url 'author:new_manuscript' %}">Submit a new manuscript</a></p>
+<div class="process-chart">
+  <div class="process-chart-col">
+    <div class="process-chart-cell cell-header">In preparation</div>
+      <article class="process-chart-cell cell-header">
+        <p class="title">
+          <a href="{% url 'author:new_manuscript' %}">Start a new manuscript</a>
+        </p>
+      </article>
+      {% for manuscript in manuscripts_in_preparation %}
+        {% include "author/partials/manuscript_cell.html" %}
+      {% endfor %}
+  </div>
+  <div class="process-chart-col">
+    <div class="process-chart-cell cell-header">In submission</div>
+    {% for manuscript in manuscripts_in_submission %}
+      {% include "author/partials/manuscript_cell.html" %}
+    {% endfor %}
+  </div>
+  <div class="process-chart-col">
+    <div class="process-chart-cell cell-header">Decided</div>
+    {% for manuscript in manuscripts_decided %}
+      {% include "author/partials/manuscript_cell.html" %}
+    {% endfor %}
+  </div>
+  <div class="process-chart-col">
+    <div class="process-chart-cell cell-header">Published</div>
+    {% for manuscript in manuscripts_published %}
+      {% include "author/partials/manuscript_cell.html" %}
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}

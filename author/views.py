@@ -19,8 +19,12 @@ class AuthorHome(AuthorMixin, TemplateView):
     template_name = "author/home.html"
     
     def get_context_data(self):
+        my_manuscripts = Manuscript.objects.filter(authors=self.request.user).all()
         return {
-            'manuscripts': Manuscript.objects.filter(authors=self.request.user),
+            'manuscripts_in_preparation': [m for m in my_manuscripts if m.process_stage() == "in preparation"],
+            'manuscripts_in_submission': [m for m in my_manuscripts if m.process_stage() == "in submission"],
+            'manuscripts_decided': [m for m in my_manuscripts if m.process_stage() == "decided"],
+            'manuscripts_published': [m for m in my_manuscripts if m.process_stage() == "published"],
         }
 
 class NewManuscript(AuthorMixin, FormView):

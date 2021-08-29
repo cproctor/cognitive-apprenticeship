@@ -10,7 +10,9 @@
   </head>
   <body>
   <div id="page-wrapper">
-    {% include "menu.html" %}
+    {% block menu %}
+      {% include "menu.html" %}
+    {% endblock %}
     {% block submenu %}
     {% endblock %}
     <div id="main-content">

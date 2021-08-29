@@ -1,15 +1,23 @@
 <nav id="menu">
 	<div class="menu-left">
-		<div class="menu-item"><a href="{% url 'home_page' %}">Home</a></div>
+		<div class="menu-item{% if menu_section == 'public' %} current{% endif %}">
+      <a href="{% url 'home_page' %}">Home</a>
+    </div>
 		{% if user.is_authenticated %}
 		  {% if user.profile.is_author %}
-		    <div class="menu-item"><a href="{% url 'author:home' %}">Author</a></div>
+		    <div class="menu-item {% if menu_section == 'author' %} current{% endif %}">
+          <a href="{% url 'author:home' %}">Author</a>
+        </div>
 			{% endif %}
 		  {% if user.profile.is_reviewer %}
-		    <div class="menu-item"><a href="{% url 'reviewer:home' %}">Reviewer</a></div>
+      <div class="menu-item{% if menu_section == 'reviewer' %} current{% endif %}">
+        <a href="{% url 'reviewer:home' %}">Reviewer</a>
+      </div>
 			{% endif %}
 		  {% if user.profile.is_editor %}
-		    <div class="menu-item"><a href="{% url 'editor:home' %}">Editor</a></div>
+		    <div class="menu-item{% if menu_section == 'editor' %} current{% endif %}">
+          <a href="{% url 'editor:home' %}">Editor</a>
+        </div>
 			{% endif %}
 		{% endif %}
 	</div>

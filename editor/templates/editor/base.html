@@ -5,6 +5,12 @@
   <link rel="stylesheet" href="{% static 'editor_style.css' %}">
 {% endblock %}
 
+{% block menu %}
+  {% with menu_section="editor" %}
+    {% include "menu.html" %}
+  {% endwith %}
+{% endblock %}
+
 {% block submenu %}
   {% include "editor/submenu.html" %}
 {% endblock %}

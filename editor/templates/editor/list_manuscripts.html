@@ -7,24 +7,24 @@
   <input type="submit" value="Search by username">
 </form>
 <hr>
-<div class="editor-manuscripts">
-	<div class="editor-manuscripts-col">
-		<div class="cell cell-header">Unsubmitted</div>
+<div class="process-chart">
+	<div class="process-chart-col">
+		<div class="process-chart-cell cell-header">Unsubmitted</div>
 		{% for manuscript in unsubmitted_manuscripts %}
 		  {% include "editor/manuscript_cell.html" %}
 		{% endfor %}
-	</div><div class="editor-manuscripts-col">
-		<div class="cell cell-header">Pending</div>
+	</div><div class="process-chart-col">
+		<div class="process-chart-cell cell-header">Pending</div>
 		{% for manuscript in pending_manuscripts %}
 		  {% include "editor/manuscript_cell.html" %}
 		{% endfor %}
-	</div><div class="editor-manuscripts-col">
-		<div class="cell cell-header">Decided</div>
+	</div><div class="process-chart-col">
+		<div class="process-chart-cell cell-header">Decided</div>
 		{% for manuscript in decided_manuscripts %}
 		  {% include "editor/manuscript_cell.html" %}
 		{% endfor %}
-	</div><div class="editor-manuscripts-col">
-		<div class="cell cell-header">Published</div>
+	</div><div class="process-chart-col">
+		<div class="process-chart-cell cell-header">Published</div>
 		{% for manuscript in published_manuscripts %}
 		  {% include "editor/manuscript_cell.html" %}
 		{% endfor %}

@@ -1,24 +1,19 @@
-{% extends "base.html" %}
+{% extends "reviewer/base.html" %}
 
 {% block content %}
-<h1>Reviewer</h1>
+<h1>Your Reviews</h1>
 
-<h2>Assigned reviews</h2>
-{% if reviews_assigned %}
-  {% for review in reviews_assigned %}
-    {% include "reviewer/partials/review_summary.html" %}
-      {% endfor %}
-{% else %}
-  <p>You have no assigned reviews.<p>
-{% endif %}
-
-<h2>Closed reviews</h2>
-{% if reviews_closed %}
-  {% for review in reviews_closed %}
-    {% include "reviewer/partials/review_summary.html" %}
-      {% endfor %}
-{% else %}
-  <p>You have no closed reviews.<p>
-{% endif %}
+<div class="process-chart">
+  <div class="process-chart-col">
+    <div class="process-chart-cell cell-header">Assigned</div>
+    {% for review in reviews_assigned %}
+      {% include "reviewer/partials/review_cell.html" %}
+    {% endfor %}
+  </div><div class="process-chart-col">
+    <div class="process-chart-cell cell-header">Closed</div>
+    {% for review in reviews_closed %}
+      {% include "reviewer/partials/review_cell.html" %}
+    {% endfor %}
+  </div>
 {% endblock %}
 

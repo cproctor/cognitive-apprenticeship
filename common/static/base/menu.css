@@ -25,3 +25,9 @@
 	color: white;
 	text-decoration: none;
 }
+.menu-item.current {
+  background-color: #eee;
+}
+#menu .menu-item.current a {
+  color: black;
+}

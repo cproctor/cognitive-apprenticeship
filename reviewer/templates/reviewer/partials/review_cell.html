@@ -1,5 +1,6 @@
 <article class="process-chart-cell">
-  <p class="title">{{review.revision.title}}</p>
+  <p class="title">
+    <a href="{% url 'reviewer:show_manuscript' review.revision.manuscript.id %}">{{review.revision.title}}</a></p>
 	<p>Due {{review.date_due}}</p>
 	<p class="review-status">{{review.status}}</p>
 </article>

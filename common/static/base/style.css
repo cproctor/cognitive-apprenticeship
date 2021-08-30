@@ -93,3 +93,18 @@ article.revision {
     padding: 4px;
     font-style: italic;
 }
+.manuscript-revision-tabs {
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  border-top: 8px solid #ddd;
+  background-color: #ddd;
+}
+.manuscript-revision-tabs .tab {
+  padding: 4px;
+  width: 25%;
+}
+.manuscript-revision-tabs .tab.current {
+  background-color: white;
+}
+

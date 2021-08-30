@@ -1,12 +1,9 @@
-{% extends "author/base.html" %}
-
-{% block content %}
 <div id="manuscript-layout">
   <div class="manuscript-sidebar">
   {% block sidebar %}
     {% with current_revision=revision %}
       {% for revision in manuscript.revisions.all %}
-        {% include "author/partials/revision_summary.html" %}
+        {% include "reviewer/partials/revision_summary.html" %}
       {% endfor %}
     {% endwith %}
   {% endblock %}
@@ -15,7 +12,6 @@
     <div class="manuscript-header">
       {% block manuscript_header %}
       <h1>{{revision.title}}</h1>
-      <p>by {{manuscript.author_names}}</p>
       <div class="manuscript-actions">
         {% block manuscript_actions %}
         {% endblock %}
@@ -23,11 +19,7 @@
       {% endblock %}
     </div>
     {% block manuscript_divider %}
-    <div class="manuscript-revision-tabs">
-      <div class="tab current">
-        Text
-      </div>
-    </div>
+    <hr>
     {% endblock %}
     <div class="manuscript-text">
       {% block manuscript_text %}
@@ -36,4 +28,3 @@
     </div>
   </div>
 </div>
-{% endblock %}

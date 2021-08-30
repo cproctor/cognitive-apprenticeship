@@ -1,0 +1,23 @@
+{% extends "reviewer/manuscript_revision.html" %}
+
+{% block head %}
+  {{ form.media }}
+{% endblock %}
+
+{% block manuscript_divider %}
+<div class="manuscript-revision-tabs">
+  <div class="tab">
+    <a href="{% url 'reviewer:show_revision' manuscript.pk revision.revision_number %}">Text</a>
+  </div>
+  <div class="tab current">
+    Review
+  </div>
+</div>
+{% endblock %}
+
+{% block manuscript_text %}
+<form action="{% url 'reviewer:review_revision' manuscript.pk revision.revision_number %}">
+  {% csrf_token %}
+  {{form.as_p}}
+</form>
+{% endblock %}

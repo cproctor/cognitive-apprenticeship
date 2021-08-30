@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 
 from .models import Review
 from .mixins import ReviewerMixin
+from .forms import EditReviewForm
 
 class ReviewerHome(ReviewerMixin, TemplateView):
     template_name = "reviewer/home.html"
@@ -42,12 +43,15 @@ class ShowRevision(ReviewerMixin, ManuscriptRevisionMixin, DetailView):
     """Implements the main tab for a revision.
     """
     model = Revision
-    template_name = "reviewer/revision_detail.html"
+    template_name = "reviewer/manuscript_revision_detail.html"
 
 class ShowRevisionReviews(ReviewerMixin, DetailView):
     """Implements the reviews tab for a mixin."""
 
-class ReviewRevision(ReviewerMixin, UpdateView):
+class ReviewRevision(ReviewerMixin, ManuscriptRevisionMixin, UpdateView):
     """Implements the review-authoring tab for a revision.
     """
+    model = Review
+    form_class = EditReviewForm
+    template_name = "reviewer/edit_review.html"
 

@@ -23,5 +23,11 @@
   {% csrf_token %}
   <hr>
   {{form.text}}
+  <div>
+    <label for="{{form.additional_authors.id_for_label}}"><h3>Additional authors</h3></label>
+    <p>
+      {{form.additional_authors}}
+    <p>
+  </div>
 </form>
 {% endblock %}

@@ -29,6 +29,9 @@ class Manuscript(models.Model):
 
     objects = ManuscriptManager()
 
+    def __str__(self):
+        return '"{}" by {} ({})'.format(self.short_title(), self.author_names(), self.status_message())
+
     def get_absolute_url(self):
         return reverse('author:show_manuscript', self.id)
 
@@ -78,7 +81,8 @@ class Manuscript(models.Model):
         return process_stages[last_revision_status]
 
 class ManuscriptAuthorship(models.Model):
-    manuscript = models.ForeignKey(Manuscript, on_delete=models.CASCADE)
+    manuscript = models.ForeignKey(Manuscript, on_delete=models.CASCADE,
+        related_name="authorships")
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     acknowledged = models.BooleanField(default=False)
 
@@ -108,6 +112,14 @@ class Revision(models.Model):
     date_published = models.DateTimeField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=StatusChoices.choices,
             default=StatusChoices.PENDING)
+
+    def __str__(self):
+        return '"{}" by {} (v{} {})'.format(
+            self.title, 
+            self.manuscript.author_names(), 
+            self.revision_number,
+            self.status_message(),
+        )
 
     def get_absolute_url(self):
         return reverse('author:show_revision', args=[self.manuscript_id, self.revision_number])

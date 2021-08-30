@@ -1,6 +1,28 @@
 {% extends "author/manuscript_revision.html" %}
 
-{% block manuscript_actions %}
+{% block manuscript_header %}
+<h1>{{revision.title}}</h1>
+<p>by {{manuscript.author_names}}</p>
+{% if is_waiting_for_authors %}
+    {% if needs_to_acknowledge %}
+        <div class="authorship-acknowledgement">
+          <p>
+            You are listed as an author on this manuscript. If you agree,
+            click the button below to acknowledge authorship.
+          </p>
+          <form class="actions" method="post" 
+            action="{% url 'author:show_revision' revision.manuscript_id revision.revision_number %}">
+            {% csrf_token %}
+            <input type="submit" name="action" value="Acknowledge authorship">
+          </form>
+        </div>
+    {% else %}
+        <div class="authorship-acknowledgement">
+            <p>{{missing_authors_message}}</p>
+        </div>
+    {% endif %}
+{% endif %}
+<div class="manuscript-actions">
   {% if revision.can_edit %}
   <a href="{% url 'author:edit_revision' revision.manuscript_id revision.revision_number %}">
     <button>Edit</button>
@@ -19,4 +41,6 @@
       <input type="submit" name="action" value="Create a new revision">
     {% endif %}
   </form>
+</div>
 {% endblock %}
+

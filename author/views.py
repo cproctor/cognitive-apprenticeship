@@ -82,6 +82,30 @@ class ShowRevision(AuthorMixin, ManuscriptRevisionMixin, DetailView):
     model = Revision
     template_name = "author/manuscript_revision_detail.html"
 
+    def get_context_data(self, *args, **kwargs):
+        c = super().get_context_data(*args, **kwargs)
+        m = self.get_object().manuscript
+        missing_authorships = m.authorships.filter(acknowledged=False).all()
+        missing_authors = [authorship.author for authorship in missing_authorships]
+
+        c['is_waiting_for_authors'] = (len(missing_authors) > 0)
+        c['needs_to_acknowledge'] = self.request.user in missing_authors
+        if len(missing_authors) == 1:
+            missing_msg = (
+                "{} is listed as an author but has not yet " + 
+                "acknowledged authorship. They need to do this before " + 
+                "the manuscript can be submitted."
+            )
+            c['missing_authors_message'] = missing_msg.format(m.format_author_names(missing_authors))
+        elif len(missing_authors) > 1:
+            missing_msg = (
+                "{} are listed as authors but have not yet " + 
+                "acknowledged authorship. They each need to do this before " + 
+                "the manuscript can be submitted."
+            )
+            c['missing_authors_message'] = missing_msg.format(m.format_author_names(missing_authors))
+        return c
+
     def post(self, request, *args, **kwargs):
         revision = self.get_object()
         action = request.POST['action'].upper()
@@ -96,6 +120,8 @@ class ShowRevision(AuthorMixin, ManuscriptRevisionMixin, DetailView):
                     return self.withdraw_revision()
                 else:
                     raise ActionNotAllowed("withdraw")
+            elif action == "ACKNOWLEDGE AUTHORSHIP":
+                return self.acknowledge_authorship()
             elif action == "CREATE A NEW REVISION":
                 if revision.can_create_new_revision():
                     return self.create_new_revision()
@@ -126,6 +152,28 @@ class ShowRevision(AuthorMixin, ManuscriptRevisionMixin, DetailView):
         revision.date_decided = datetime.now()
         revision.save()
         message = "Your manuscript has been withdrawn and will not be reviewed."
+        messages.add_message(self.request, messages.INFO, message)
+        return redirect(
+            'author:show_revision', 
+            manuscript_pk=revision.manuscript_id,
+            revision_number=revision.revision_number
+        )
+
+    def can_acknowledge_authorship(self):
+        return self.get_object().manuscript.authorships.filter(
+            acknowledged=False,
+            author=self.request.user
+        ).count()
+
+    def acknowledge_authorship(self):
+        revision = self.get_object()
+        authorship = revision.manuscript.authorships.get(
+            acknowledged=False,
+            author=self.request.user
+        )
+        authorship.acknowledged = True
+        authorship.save()
+        message = "You acknowledged authorship of this manuscript."
         messages.add_message(self.request, messages.INFO, message)
         return redirect(
             'author:show_revision', 

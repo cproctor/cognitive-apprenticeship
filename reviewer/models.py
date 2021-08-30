@@ -11,6 +11,7 @@ class Review(models.Model):
         COMPLETE = 'COMPLETE', 'Complete'
         EXPIRED = 'EXPIRED', 'Expired'
         WITHDRAWN = 'WITHDRAWN', 'Manuscript was withdrawn'
+        EDIT_REQUESTED = 'EDIT_REQUESTED', 'Editing of review requested'
     class RecommendationChoices(models.TextChoices):
         ACCEPT = 'ACCEPT', 'Accept'
         MINOR_REVISION = 'MINOR', 'Minor revision'
@@ -22,11 +23,19 @@ class Review(models.Model):
     text = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.ASSIGNED)
     recommendation = models.CharField(max_length=20,
-            choices=RecommendationChoices.choices, null=True)
+            choices=RecommendationChoices.choices, blank=True, null=True)
     date_due = models.DateTimeField()
-    date_submitted = models.DateTimeField(null=True)
+    date_submitted = models.DateTimeField(blank=True, null=True)
 
     objects = ReviewManager()
+
+    def __str__(self):
+        return 'Review of "{}" v{} assigned to {} ({})'.format(
+            self.revision.title,
+            self.revision.revision_number,
+            self.reviewer.username,
+            self.status
+        )
 
 class ManuscriptReviewer(models.Model):
     manuscript = models.ForeignKey('author.Manuscript', on_delete=models.CASCADE)

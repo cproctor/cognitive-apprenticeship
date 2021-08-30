@@ -26,6 +26,7 @@ class Review(models.Model):
             choices=RecommendationChoices.choices, blank=True, null=True)
     date_due = models.DateTimeField()
     date_submitted = models.DateTimeField(blank=True, null=True)
+    editor_feedback = models.TextField(blank=True, null=True)
 
     objects = ReviewManager()
 

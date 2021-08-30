@@ -19,6 +19,11 @@
           <a href="{% url 'editor:home' %}">Editor</a>
         </div>
 			{% endif %}
+		  {% if user.is_superuser %}
+		    <div class="menu-item">
+          <a href="{% url 'admin:index' %}">Admin</a>
+        </div>
+			{% endif %}
 		{% endif %}
 	</div>
 	<div class="menu-right">

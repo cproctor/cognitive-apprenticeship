@@ -27,6 +27,9 @@ class AuthorHome(AuthorMixin, TemplateView):
             'manuscripts_published': [m for m in my_manuscripts if m.process_stage() == "published"],
         }
 
+class AuthorInstructions(AuthorMixin, TemplateView):
+    template_name = "author/instructions.html"
+
 class NewManuscript(AuthorMixin, FormView):
     form_class = NewManuscriptForm
     template_name = "author/new_manuscript.html"

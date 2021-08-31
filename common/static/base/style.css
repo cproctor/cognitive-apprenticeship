@@ -107,4 +107,6 @@ article.revision {
 .manuscript-revision-tabs .tab.current {
   background-color: white;
 }
-
+.explanation {
+    font-style: italic;
+}

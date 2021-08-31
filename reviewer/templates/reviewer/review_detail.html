@@ -1,6 +1,16 @@
-{% extends "reviewer/base.html" %}
+{% extends "reviewer/manuscript_revision.html" %}
 
-{% block content %}
-  {% include "author/partials/manuscript.html" %}
-{% endblock%}
+{% block manuscript_divider %}
+<div class="manuscript-revision-tabs">
+  <div class="tab">
+    <a href="{% url 'reviewer:show_revision' manuscript.pk revision.revision_number %}">Text</a>
+  </div>
+  <div class="tab current">
+    Review
+  </div>
+</div>
+{% endblock %}
 
+{% block manuscript_text %}
+  {{review.text|safe}}
+{% endblock %}

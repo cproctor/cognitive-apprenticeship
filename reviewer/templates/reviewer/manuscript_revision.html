@@ -6,3 +6,10 @@
   {% endwith %}
 {% endblock %}
 
+{% block sidebar %}
+  {% with current_revision=revision %}
+    {% for revision in manuscript.revisions.all %}
+      {% include "reviewer/partials/revision_summary.html" %}
+    {% endfor %}
+  {% endwith %}
+{% endblock %}

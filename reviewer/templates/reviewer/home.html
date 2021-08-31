@@ -2,6 +2,8 @@
 
 {% block content %}
 <h1>Your Reviews</h1>
+<p class="explanation">You are automatically assigned as a reviewer when authors submit new
+manuscripts.</p>
 
 <div class="process-chart">
   <div class="process-chart-col">
@@ -9,11 +11,19 @@
     {% for review in reviews_assigned %}
       {% include "reviewer/partials/review_cell.html" %}
     {% endfor %}
-  </div><div class="process-chart-col">
+  </div>
+  <div class="process-chart-col">
     <div class="process-chart-cell cell-header">Closed</div>
     {% for review in reviews_closed %}
       {% include "reviewer/partials/review_cell.html" %}
     {% endfor %}
+    </div><div class="process-chart-col">
+    <div class="process-chart-cell cell-header">Complete</div>
+    {% for review in reviews_complete %}
+      {% include "reviewer/partials/review_cell.html" %}
+    {% endfor %}
+    </div>
   </div>
+</div>
 {% endblock %}
 

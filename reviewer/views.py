@@ -15,16 +15,22 @@ class ReviewerHome(ReviewerMixin, TemplateView):
     def get_context_data(self):
         c = super().get_context_data()
         my_reviews = Review.objects.filter(reviewer=self.request.user)
+
+        assigned_statuses = [
+            Review.StatusChoices.ASSIGNED,
+            Review.StatusChoices.EDIT_REQUESTED,
+        ]
         c['reviews_assigned'] = (my_reviews
-            .filter(status=Review.StatusChoices.ASSIGNED)
+            .filter(status__in=assigned_statuses)
             .filter(revision__status=Revision.StatusChoices.PENDING)
             .all()
         )
         closed_statuses = [
             Review.StatusChoices.EXPIRED,
-            Review.StatusChoices.COMPLETE
+            Review.StatusChoices.WITHDRAWN,
         ]
         c['reviews_closed'] = my_reviews.filter(status__in=closed_statuses).all()
+        c['reviews_complete'] = my_reviews.filter(status=Review.StatusChoices.COMPLETE).all()
         return c
 
 class ShowManuscript(ReviewerMixin, DetailView):
@@ -45,10 +51,15 @@ class ShowRevision(ReviewerMixin, ManuscriptRevisionMixin, DetailView):
     model = Revision
     template_name = "reviewer/manuscript_revision_detail.html"
 
-class ShowRevisionReviews(ReviewerMixin, DetailView):
-    """Implements the reviews tab for a mixin."""
+class ShowReviews(ReviewerMixin, ManuscriptRevisionMixin, DetailView):
+    """Implements the reviews tab."""
+    template_name = "reviewer/reviews_detail.html"
 
-class ReviewRevision(ReviewerMixin, ManuscriptRevisionMixin, UpdateView):
+class ShowReview(ReviewerMixin, ManuscriptRevisionMixin, DetailView):
+    """Implements the review tab."""
+    template_name = "reviewer/review_detail.html"
+
+class EditReview(ReviewerMixin, ManuscriptRevisionMixin, UpdateView):
     """Implements the review-authoring tab for a revision.
     """
     model = Review

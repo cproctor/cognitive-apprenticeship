@@ -12,6 +12,7 @@
   {% endblock %}
   </div>
   <div class="manuscript-content">
+    {% block manuscript_content %}
     <div class="manuscript-header">
       {% block manuscript_header %}
       <h1>{{revision.title}}</h1>
@@ -34,6 +35,7 @@
         {{revision.text|safe}}
       {% endblock %}
     </div>
+    {% endblock %}
   </div>
 </div>
 {% endblock %}

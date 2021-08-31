@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -108,6 +109,29 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGGING = {
+    'version': 1,
+    'formatters': {
+        'json': {
+            '()': 'json_log_formatter.JSONFormatter',
+        }
+    },  
+    'handlers': {
+        'analytics': {
+            'class': 'logging.FileHandler',
+            'level': 'INFO',
+            'filename': 'analytics.log',
+            'formatter': 'json'
+        }
+    },
+    'loggers': {
+        'cognitive_apprenticeship.analytics': {
+            'handlers': ['analytics'],
+            'level': 'INFO',
+            'propagate': True,
+        }
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/

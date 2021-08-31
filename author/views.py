@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.contrib import messages
 from .models import Manuscript, ManuscriptAuthorship, Revision
 from .forms import NewManuscriptForm, EditRevisionForm
+from .state_machine import RevisionStateMachine
 from .mixins import (
     AuthorMixin,
     ManuscriptRevisionMixin,
@@ -112,56 +113,44 @@ class ShowRevision(AuthorMixin, ManuscriptRevisionMixin, DetailView):
     def post(self, request, *args, **kwargs):
         revision = self.get_object()
         action = request.POST['action'].upper()
-        try:
-            if action == "SUBMIT":
-                if revision.can_submit():
-                    return self.submit_revision()
-                else:
-                    raise ActionNotAllowed("submit")
-            elif action == "WITHDRAW":
-                if revision.can_withdraw():
-                    return self.withdraw_revision()
-                else:
-                    raise ActionNotAllowed("withdraw")
-            elif action == "ACKNOWLEDGE AUTHORSHIP":
-                return self.acknowledge_authorship()
-            elif action == "CREATE A NEW REVISION":
-                if revision.can_create_new_revision():
-                    return self.create_new_revision()
-                else:
-                    raise ActionNotAllowed("new revision")
+        sm = RevisionStateMachine(request)
+        redirect_to_revision = redirect(
+            'author:show_revision', 
+            manuscript_pk=revision.manuscript_id,
+            revision_number=revision.revision_number
+        )
+        if action == "SUBMIT":
+            #try:
+            if True:
+                sm.transition(revision, sm.states.PENDING)
+                return redirect_to_revision
+            #except sm.IllegalTransition:
+                #return self.forbid_action("submit")
+        elif action == "WITHDRAW":
+            try:
+                sm.transition(revision, sm.states.WITHDRAWN)
+                return redirect_to_revision
+            except sm.IllegalTransition:
+                return self.forbid_action("withdraw")
+        elif action == "ACKNOWLEDGE AUTHORSHIP":
+            if self.can_acknowledge_authorship():
+                self.acknowledge_authorship(self)
+                sm.transition(revision, sm.states.UNSUBMITTED)
             else:
-                return HttpResponseForbidden("Unrecognized action")
-        except ActionNotAllowed as e:
-            messages.add_message(request, messages.WARNING, str(e))
-            return HttpResponseForbidden(str(e))
+                return self.forbid_action("acknowledge authorship")
+        elif action == "CREATE A NEW REVISION":
+            if revision.can_create_new_revision():
+                return self.create_new_revision()
+            else:
+                return self.forbid_action("create a new revision")
+        else:
+            return self.forbid_action(action)
 
-    def submit_revision(self):
-        revision = self.get_object()
-        revision.status = revision.StatusChoices.PENDING
-        revision.date_submitted = datetime.now()
-        revision.save()
-        message = "Your manuscript has been submitted. You will be notified once reviewers provide feedback."
-        messages.add_message(self.request, messages.INFO, message)
-        return redirect(
-            'author:show_revision', 
-            manuscript_pk=revision.manuscript_id,
-            revision_number=revision.revision_number
-        )
-
-    def withdraw_revision(self):
-        revision = self.get_object()
-        revision.status = revision.StatusChoices.WITHDRAWN
-        revision.date_decided = datetime.now()
-        revision.save()
-        message = "Your manuscript has been withdrawn and will not be reviewed."
-        messages.add_message(self.request, messages.INFO, message)
-        return redirect(
-            'author:show_revision', 
-            manuscript_pk=revision.manuscript_id,
-            revision_number=revision.revision_number
-        )
-
+    def forbid_action(self, action):
+        msg = "Action '{}' is not allowed.".format(action)
+        messages.add_message(self.request, messages.WARNING, msg)
+        return HttpResponseForbidden(msg)
+        
     def can_acknowledge_authorship(self):
         return self.get_object().manuscript.authorships.filter(
             acknowledged=False,

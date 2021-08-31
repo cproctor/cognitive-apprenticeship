@@ -3,6 +3,7 @@
 {% block manuscript_header %}
 <h1>{{revision.title}}</h1>
 <p>by {{manuscript.author_names}}</p>
+<p> {{revision.status}}</p>
 {% if is_waiting_for_authors %}
     {% if needs_to_acknowledge %}
         <div class="authorship-acknowledgement">

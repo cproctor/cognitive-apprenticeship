@@ -8,6 +8,7 @@ class ReviewManager(models.Manager):
 class Review(models.Model):
     class StatusChoices(models.TextChoices):
         ASSIGNED = 'ASSIGNED', 'Assigned'
+        SUBMITTED = 'SUBMITTED', 'Submitted'
         COMPLETE = 'COMPLETE', 'Complete'
         EXPIRED = 'EXPIRED', 'Expired'
         WITHDRAWN = 'WITHDRAWN', 'Manuscript was withdrawn'

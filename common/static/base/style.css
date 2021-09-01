@@ -108,5 +108,8 @@ article.revision {
   background-color: white;
 }
 .explanation {
-    font-style: italic;
+  font-style: italic;
+}
+.decision {
+  font-style: italic;
 }

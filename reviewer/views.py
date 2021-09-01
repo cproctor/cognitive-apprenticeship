@@ -3,6 +3,7 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
 from author.models import Manuscript, Revision
 from author.mixins import ManuscriptRevisionMixin
+from django.urls import reverse
 from django.shortcuts import redirect
 
 from .models import Review
@@ -45,7 +46,7 @@ class ShowManuscript(ReviewerMixin, DetailView):
         m = self.get_object()
         return redirect('reviewer:show_revision', m.id, m.revisions.last().revision_number)
 
-class ShowRevision(ReviewerMixin, ManuscriptRevisionMixin, DetailView):
+class ShowRevision(ReviewerMixin, ManuscriptRevisionMixin, RevisionReviewMixin, DetailView):
     """Implements the main tab for a revision.
     """
     model = Revision
@@ -55,15 +56,23 @@ class ShowReviews(ReviewerMixin, ManuscriptRevisionMixin, DetailView):
     """Implements the reviews tab."""
     template_name = "reviewer/reviews_detail.html"
 
-class ShowReview(ReviewerMixin, ManuscriptRevisionMixin, DetailView):
+class ShowReview(ReviewerMixin, ManuscriptRevisionMixin, RevisionReviewMixin, DetailView):
     """Implements the review tab."""
     template_name = "reviewer/review_detail.html"
+
+    def get(self, request, *args, **kwargs):
+        review = self.get_review()
+        if not review.text or not review.text.strip():
+            m_id = self.get_revision().manuscript_id
+            return redirect('reviewer:edit_review', m_id, self.get_revision().revision_number)
+        else:
+            return super().get(request, *args, **kwargs)
 
 class ShowReviewInstructions(ReviewerMixin, ManuscriptRevisionMixin, TemplateView):
     """Implements the review instructions tab."""
     template_name = "reviewer/review_instructions.html"
 
-class EditReview(ReviewerMixin, UpdateView):
+class EditReview(ReviewerMixin, RevisionReviewMixin, UpdateView):
     """Implements the review-authoring tab for a revision.
     """
     model = Review

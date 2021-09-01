@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 class ReviewManager(models.Manager):
     def for_manuscript(self, manuscript):
@@ -45,9 +46,9 @@ class Review(models.Model):
     def is_assigned(self):
         return self.status == self.StatusChoices.ASSIGNED
 
-# the review should be shown:
-# - if the revision is submitted (e.g. waiting for your review)
-
+    def get_absolute_url(self):
+        return reverse('reviewer:show_review', 
+                args=(self.revision.manuscript_id, self.revision.revision_number))
 
 class ManuscriptReviewer(models.Model):
     manuscript = models.ForeignKey('author.Manuscript', on_delete=models.CASCADE)

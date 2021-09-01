@@ -2,6 +2,7 @@ from author.models import Revision
 from .models import Review
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.http import Http404
 
 class ReviewerMixin:
     def dispatch(self, request, *args, **kwargs):

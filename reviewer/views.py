@@ -6,7 +6,7 @@ from author.mixins import ManuscriptRevisionMixin
 from django.shortcuts import redirect
 
 from .models import Review
-from .mixins import ReviewerMixin
+from .mixins import ReviewerMixin, RevisionReviewMixin
 from .forms import EditReviewForm
 
 class ReviewerHome(ReviewerMixin, TemplateView):

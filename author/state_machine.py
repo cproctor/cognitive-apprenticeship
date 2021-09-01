@@ -1,8 +1,11 @@
 from common.state_machine import StateMachine
 from django.contrib import messages
-from datetime import datetime
+from django.conf import settings
+from datetime import datetime, timedelta
 import logging
 from .models import Revision
+from reviewer.models import Review
+from reviewer.state_machine import ReviewStateMachine
 
 logger = logging.getLogger("cognitive_apprenticeship.analytics")
 
@@ -26,6 +29,12 @@ class RevisionStateMachine(StateMachine):
         rev.status = new_state
         rev.date_submitted = datetime.now()
         rev.save()
+        for reviewer in rev.manuscript.reviewers.all():
+            if not rev.reviews.filter(reviewer=reviewer).exists():
+                rev.reviews.create(
+                    reviewer=reviewer,
+                    date_due=datetime.now() + timedelta(days=settings.DAYS_TO_REVIEW)
+                )
 
     def waiting_for_authors_to_unsubmitted(self, rev, old_state, new_state):
         self.log_state_transition(rev, old_state, new_state)
@@ -39,6 +48,9 @@ class RevisionStateMachine(StateMachine):
         rev.status = new_state
         rev.date_decided = datetime.now()
         rev.save()
+        review_state_machine = ReviewStateMachine()
+        for review in rev.reviews.filter(status=Review.StatusChoices.ASSIGNED).all():
+            review_state_machine.transition(review, Review.StatusChoices.WITHDRAWN)
 
     def pending_to_accept(self, rev, old_state, new_state):
         self._decision_transition(rev, old_state, new_state)

@@ -24,6 +24,7 @@ class ReviewerMixin:
         """
         return Revision.objects.filter(manuscript__reviewers=self.request.user)
 
+class RevisionReviewMixin:
     def get_revision(self):
         "Looks up a revision by manuscript id and revision_number."
         try:

@@ -1,4 +1,5 @@
 from author.models import Revision
+from .models import Review
 from django.contrib import messages
 from django.shortcuts import redirect
 
@@ -23,3 +24,32 @@ class ReviewerMixin:
         """
         return Revision.objects.filter(manuscript__reviewers=self.request.user)
 
+    def get_revision(self):
+        "Looks up a revision by manuscript id and revision_number."
+        try:
+            qs = Revision.objects.filter(
+                manuscript__id=self.kwargs['manuscript_pk'],
+                revision_number=self.kwargs['revision_number']
+            )
+            return qs.get()
+        except Revision.DoesNotExist:
+            raise Http404("No such revision")
+
+    def get_review(self):
+        """Returns the review.
+        """
+        revision = self.get_revision()
+        try:
+            return revision.reviews.get(reviewer=self.request.user)
+        except Review.DoesNotExist:
+            return None
+
+    def get_context_data(self, *args, **kwargs):
+        """Populates shared context data.
+        """
+        c = super().get_context_data(*args, **kwargs)
+        review = self.get_review()
+        c['review'] = review
+        c['review_deadline'] = review.date_due if review else None
+        #c['show_review_tab'] = review.should_show
+        return c

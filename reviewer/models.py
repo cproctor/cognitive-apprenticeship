@@ -39,6 +39,16 @@ class Review(models.Model):
             self.status
         )
 
+    def is_expired(self):
+        return self.status == self.StatusChoices.EXPIRED
+
+    def is_assigned(self):
+        return self.status == self.StatusChoices.ASSIGNED
+
+# the review should be shown:
+# - if the revision is submitted (e.g. waiting for your review)
+
+
 class ManuscriptReviewer(models.Model):
     manuscript = models.ForeignKey('author.Manuscript', on_delete=models.CASCADE)
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE)

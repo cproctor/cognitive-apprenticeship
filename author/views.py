@@ -88,7 +88,8 @@ class ShowRevision(AuthorMixin, ManuscriptRevisionMixin, DetailView):
 
     def get_context_data(self, *args, **kwargs):
         c = super().get_context_data(*args, **kwargs)
-        m = self.get_object().manuscript
+        revision = self.get_object()
+        m = revision.manuscript
         missing_authorships = m.authorships.filter(acknowledged=False).all()
         missing_authors = [authorship.author for authorship in missing_authorships]
 
@@ -108,6 +109,10 @@ class ShowRevision(AuthorMixin, ManuscriptRevisionMixin, DetailView):
                 "the manuscript can be submitted."
             )
             c['missing_authors_message'] = missing_msg.format(m.format_author_names(missing_authors))
+            c['withdrawal_forbidden_because_reviews_underway'] = (
+                self.self.status == self.StatusChoices.PENDING and 
+                self.has_reviews_underway()
+            )
         return c
 
     def post(self, request, *args, **kwargs):
@@ -120,13 +125,14 @@ class ShowRevision(AuthorMixin, ManuscriptRevisionMixin, DetailView):
             revision_number=revision.revision_number
         )
         if action == "SUBMIT":
-            #try:
-            if True:
+            try:
                 sm.transition(revision, sm.states.PENDING)
                 return redirect_to_revision
-            #except sm.IllegalTransition:
-                #return self.forbid_action("submit")
+            except sm.IllegalTransition:
+                return self.forbid_action("submit")
         elif action == "WITHDRAW":
+            if not revision.can_withdraw():
+                return self.forbid_action("withdraw")
             try:
                 sm.transition(revision, sm.states.WITHDRAWN)
                 return redirect_to_revision

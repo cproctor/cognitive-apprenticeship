@@ -23,6 +23,11 @@
         </div>
     {% endif %}
 {% endif %}
+{% if withdrawal_forbidden_because_reviews_underway %}
+    <div class="explanation">
+        <p>Currently being reviewed.</p>
+    </div>
+{% endif %}
 <div class="manuscript-actions">
   {% if revision.can_edit %}
   <a href="{% url 'author:edit_revision' revision.manuscript_id revision.revision_number %}">

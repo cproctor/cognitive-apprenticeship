@@ -6,10 +6,32 @@
   {% endwith %}
 {% endblock %}
 
+{% block submenu %}
+  {% include "reviewer/partials/submenu.html" %}
+{% endblock %}
+
 {% block sidebar %}
   {% with current_revision=revision %}
     {% for revision in manuscript.revisions.all %}
       {% include "reviewer/partials/revision_summary.html" %}
     {% endfor %}
   {% endwith %}
+{% endblock %}
+
+{% block manuscript_header %}
+<h1>{{revision.title}}</h1>
+{% if review.is_expired %}
+  <div class="explanation">
+    <p>The deadline has passed for this review. Please contact the editor to request an extension.</p>
+  </div>
+{% elif review.is_assigned %}
+  <div class="explanation">
+    <p>Your review is due {{review_deadline}}.</p>
+  </div>
+{% endif %}
+
+<div class="manuscript-actions">
+  {% block manuscript_actions %}
+  {% endblock %}
+</div>
 {% endblock %}

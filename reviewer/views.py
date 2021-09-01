@@ -59,10 +59,24 @@ class ShowReview(ReviewerMixin, ManuscriptRevisionMixin, DetailView):
     """Implements the review tab."""
     template_name = "reviewer/review_detail.html"
 
-class EditReview(ReviewerMixin, ManuscriptRevisionMixin, UpdateView):
+class ShowReviewInstructions(ReviewerMixin, ManuscriptRevisionMixin, TemplateView):
+    """Implements the review instructions tab."""
+    template_name = "reviewer/review_instructions.html"
+
+class EditReview(ReviewerMixin, UpdateView):
     """Implements the review-authoring tab for a revision.
     """
     model = Review
     form_class = EditReviewForm
     template_name = "reviewer/edit_review.html"
 
+    def get_object(self):
+        return self.get_revision().reviews.get(reviewer=self.request.user)
+
+    def get_context_data(self, *args, **kwargs):
+        "Populates `manuscript` and `revision` in template context."
+        ctx = super().get_context_data(*args, **kwargs)
+        revision = self.get_revision()
+        ctx['revision'] = revision
+        ctx['manuscript'] = revision.manuscript
+        return ctx

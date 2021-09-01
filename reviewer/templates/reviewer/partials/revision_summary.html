@@ -1,6 +1,6 @@
 <article class="revision {% if current_revision == revision %}current{% endif %}">
 	<h3>
-		{% if current_revision == revision %}
+		{% if current_revision == revision or revision.is_withdrawn %}
 		  {{revision.title}} (Revision {{revision.revision_number}})
 		{% else %}
 		<a href="{% url 'reviewer:show_revision' revision.manuscript_id revision.revision_number %}">
@@ -9,6 +9,6 @@
 		</a> 
 		{% endif %}
 	</h3>
-	<p>{{revision.status_message}}</p>
+	<p>{{revision.status_message_for_reviewers}}</p>
 </article>
 

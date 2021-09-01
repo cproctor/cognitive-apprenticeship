@@ -16,8 +16,19 @@
 {% endblock %}
 
 {% block manuscript_text %}
-<form action="{% url 'reviewer:review_revision' manuscript.pk revision.revision_number %}">
-  {% csrf_token %}
-  {{form.as_p}}
-</form>
+  {% include "reviewer/partials/instructions.html" %}
+
+  <hr>
+  <form action="{% url 'reviewer:edit_review' manuscript.pk revision.revision_number %}">
+    {% csrf_token %}
+    {{form.text}}
+    <div>
+      <label for="{{form.recommendation.id_for_label}}">Recommendation</label>
+      {{form.recommendation}}
+    </div>
+	<input type="submit" value="Save">
+    <a href="{% url 'reviewer:show_review' manuscript.pk revision.revision_number %}">
+      <button type="button">Cancel</button>
+    </a>
+  </form>
 {% endblock %}

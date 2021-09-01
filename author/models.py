@@ -142,6 +142,12 @@ class Revision(models.Model):
             ts = self.date_decided
         return "{} {}".format(verb.capitalize(), ts.strftime(self.timeformat))
 
+    def status_message_for_reviewers(self):
+        if self.status == self.StatusChoices.PENDING:
+            return "Awaiting review"
+        else:
+            return str(self.status)
+
     def create_new_revision(self):
         if self.manuscript.has_unacknowledged_authors():
             status = Revision.StatusChoices.WAITING_FOR_AUTHORS
@@ -158,8 +164,18 @@ class Revision(models.Model):
     def can_submit(self):
         return self.status == self.StatusChoices.UNSUBMITTED
 
+    def has_reviews_underway(self):
+        review_underway_states = ['SUBMITTED', 'COMPLETE', 'EDIT_REQUESTED']
+        return self.reviews.filter(status__in=review_underway_states).count()
+
+    def is_withdrawn(self):
+        return self.status == self.StatusChoices.WITHDRAWN
+
     def can_withdraw(self):
-        return self.status == self.StatusChoices.PENDING
+        return (
+            self.status == self.StatusChoices.PENDING and
+            not self.has_reviews_underway()
+        )
 
     def can_create_new_revision(self):
         valid_statuses = [

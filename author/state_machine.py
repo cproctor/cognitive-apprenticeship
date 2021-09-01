@@ -1,6 +1,5 @@
 from common.state_machine import StateMachine
 from django.contrib import messages
-from enum import Enum
 from datetime import datetime
 import logging
 from .models import Revision

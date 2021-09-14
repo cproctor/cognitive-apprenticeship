@@ -47,9 +47,12 @@ class Manuscript(models.Model):
         return self.revisions.last().title
 
     def author_names(self):
-        return self.format_author_names(self.authors.all())
+        return self.format_names(self.authors.all())
 
-    def format_author_names(self, users):
+    def reviewer_names(self):
+        return self.format_names(self.reviewers.all())
+
+    def format_names(self, users):
         authors = ["{} {}".format(u.first_name, u.last_name) for u in users]
         if len(authors) == 1:
             return authors[0]
@@ -65,6 +68,7 @@ class Manuscript(models.Model):
           - In submission
           - Decided
           - Published or in press
+          Only used for presentation layer. StateMachine handles transitions.
         """
         process_stages = {
             Revision.StatusChoices.UNSUBMITTED:         "in preparation",

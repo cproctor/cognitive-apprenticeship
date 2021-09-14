@@ -6,8 +6,10 @@ import logging
 from .models import Revision
 from reviewer.models import Review
 from reviewer.state_machine import ReviewStateMachine
+from reviewer.assignment import ranked_reviewers
 
 logger = logging.getLogger("cognitive_apprenticeship.analytics")
+main_logger = logging.getLogger(__name__)
 
 class RevisionStateMachine(StateMachine):
     """Handles Revision state transitions and their side effects.
@@ -29,6 +31,13 @@ class RevisionStateMachine(StateMachine):
         rev.status = new_state
         rev.date_submitted = datetime.now()
         rev.save()
+        if settings.AUTOMATICALLY_ASSIGN_REVIEWERS:
+            reviewers = ranked_reviewers(rev.manuscript.authors.all())
+            if len(reviewers) >= settings.NUMBER_OF_REVIEWERS:
+                rev.manuscript.reviewers.add(*reviewers[:settings.NUMBER_OF_REVIEWERS])
+            else:
+                msg = "Not enough reviewers for manuscript {}".format(rev.manuscript_id)
+                main_logger.warning("Not enough reviewers for manuscript {}".format(rev.manuscript_id))
         for reviewer in rev.manuscript.reviewers.all():
             if not rev.reviews.filter(reviewer=reviewer).exists():
                 rev.reviews.create(

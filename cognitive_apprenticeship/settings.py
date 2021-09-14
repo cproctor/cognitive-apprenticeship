@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'reviewer',
     'editor',
     'common',
+    'cp_utils',
 ]
 
 MIDDLEWARE = [

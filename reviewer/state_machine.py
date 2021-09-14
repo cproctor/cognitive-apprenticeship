@@ -18,7 +18,7 @@ class ReviewStateMachine(StateMachine):
     def assigned_to_submitted(self, rev, old_state, new_state):
         self.log_state_transition(rev, old_state, new_state)
         msg = "Your review was submitted. Awaiting an editor decision."
-        self.flash_authors(rev, msg.format(rev.title), level=messages.SUCCESS)
+        self.flash_authors(rev, msg, level=messages.SUCCESS)
         rev.status = new_state
         rev.date_submitted = datetime.now()
         rev.save()
@@ -26,21 +26,21 @@ class ReviewStateMachine(StateMachine):
     def assigned_to_expired(self, rev, old_state, new_state):
         self.log_state_transition(rev, old_state, new_state)
         msg = "Your assigned review expired. You may contact the editor to request an extension."
-        self.flash_authors(rev, msg.format(rev.title), level=messages.WARNING)
+        self.flash_authors(rev, msg, level=messages.WARNING)
         rev.status = new_state
         rev.save()
 
     def assigned_to_withdrawn(self, rev, old_state, new_state):
         self.log_state_transition(rev, old_state, new_state)
         msg = "The manuscript you were assigned to review was withdrawn by its author."
-        self.flash_authors(rev, msg.format(rev.title))
+        self.flash_authors(rev, msg)
         rev.status = new_state
         rev.save()
 
     def submitted_to_complete(self, rev, old_state, new_state):
         self.log_state_transition(rev, old_state, new_state)
         msg = "A manuscript you reviewed received an editorial decision."
-        self.flash_authors(rev, msg.format(rev.title))
+        self.flash_authors(rev, msg)
         rev.status = new_state
         rev.save()
 
@@ -55,7 +55,7 @@ class ReviewStateMachine(StateMachine):
     def expired_to_assigned(self, rev, old_state, new_state):
         self.log_state_transition(rev, old_state, new_state)
         msg = "The editor extended the deadline for an expired review."
-        self.flash_authors(rev, msg.format(rev.title))
+        self.flash_authors(rev, msg)
         rev.status = new_state
         rev.date_due = datetime.now + timedelta(days=settings.DAYS_ON_EXTENSION) 
         rev.save()
@@ -63,7 +63,7 @@ class ReviewStateMachine(StateMachine):
     def edit_requested_to_submitted(self, rev, old_state, new_state):
         self.log_state_transition(rev, old_state, new_state)
         msg = "You resubmitted your review."
-        self.flash_authors(rev, msg.format(rev.title), level=messages.SUCCESS)
+        self.flash_authors(rev, msg, level=messages.SUCCESS)
         rev.status = new_state
         rev.date_submitted = datetime.now()
         rev.save()
@@ -71,7 +71,7 @@ class ReviewStateMachine(StateMachine):
     def edit_requested_to_expired(self, rev, old_state, new_state):
         self.log_state_transition(rev, old_state, new_state)
         msg = "A review with edits requested has passed its deadline."
-        self.flash_authors(rev, msg.format(rev.title), level=messages.WARNING)
+        self.flash_authors(rev, msg, level=messages.WARNING)
         rev.status = new_state
         rev.save()
 

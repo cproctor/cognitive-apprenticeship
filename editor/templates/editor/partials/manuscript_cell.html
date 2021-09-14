@@ -5,16 +5,16 @@
   <p>{{manuscript.author_names}}</p>
 	<p>{{manuscript.status_message}}</p>
     <p>
-      {% if manuscript.reviewers.count > 0 %}
-        Reviewers: {{manuscript.reviewer_names}}
+      {% if manuscript.revisions.last.reviews.count %}
+        Reviews:
+        <ul>
+        {% for review in manuscript.revisions.last.reviews.all %}
+          <li>{{review.reviewer.first_name}} {{review.reviewer.last_name}} ({{review.status}})</li>
+        {% endfor %}
+        </ul>
       {% else %}
         No reviewers assigned.
       {% endif %}
     </p>
-	<p>
-		{% if manuscript.num_reviews %}
-			{{manuscript.num_complete_reviews}}/{{manuscript.num_reviews}} reviews complete.
-		{% endif %}
-	</p>
 </article>
 

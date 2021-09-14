@@ -96,6 +96,7 @@ class ShowEditorManuscript(EditorRoleRequiredMixin, DetailView):
                 return render(request, self.template_name, context)
         elif action.upper() == 'REMOVE_REVIEWER':
             user = manuscript.reviewers.get(username=request.POST['username'])
+            Review.objects.filter(revision__manuscript=manuscript, reviewer=user).delete()
             manuscript.reviewers.remove(user)
             return redirect('editor:show_manuscript', manuscript.id)
 

@@ -18,7 +18,7 @@ class Command(BaseCommand):
         send_mail(
             'Django email test',
             'Sent at {}'.format(now),
-            'proctorbot@chrisproctor.net',
+            None,
             [kwargs['recipient']],
             fail_silently=False,
         )

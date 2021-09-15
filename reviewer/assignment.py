@@ -5,7 +5,7 @@ def ranked_reviewers(authors):
     "Returns a list of possible reviewers, sorted by score"
     author_ids = [author.id for author in authors]
     candidates = User.objects.filter(profile__is_reviewer=True).exclude(id__in=author_ids).all()
-    return sorted(candidates, key=lambda c: reviewer_heuristic(authors, c))
+    return sorted(candidates, key=lambda c: reviewer_heuristic(authors, c), ascending=False)
 
 def reviewer_heuristic(authors, potential_reviewer):
     "Returns a score for an (author, reviewer) pair"

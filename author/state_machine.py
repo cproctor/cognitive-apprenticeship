@@ -8,6 +8,7 @@ from .models import Revision
 from reviewer.models import Review
 from reviewer.state_machine import ReviewStateMachine
 from reviewer.assignment import ranked_reviewers
+from reviewer.email import notify_user_when_review_created
 
 logger = logging.getLogger("cognitive_apprenticeship.analytics")
 main_logger = logging.getLogger(__name__)
@@ -46,10 +47,13 @@ class RevisionStateMachine(StateMachine):
                 main_logger.warning("Not enough reviewers for manuscript {}".format(rev.manuscript_id))
         for reviewer in rev.manuscript.reviewers.all():
             if not rev.reviews.filter(reviewer=reviewer).exists():
-                rev.reviews.create(
+                review = Review(
+                    revision=rev, 
                     reviewer=reviewer,
                     date_due=datetime.now() + timedelta(days=settings.DAYS_TO_REVIEW)
                 )
+                review.save()
+                notify_user_when_review_created(review)
 
     def waiting_for_authors_to_unsubmitted(self, rev, old_state, new_state):
         self.log_state_transition(rev, old_state, new_state)

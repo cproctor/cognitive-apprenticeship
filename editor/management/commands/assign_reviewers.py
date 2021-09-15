@@ -5,6 +5,7 @@ from django.conf import settings
 from author.models import Manuscript
 from reviewer.models import Review
 from reviewer.assignment import ranked_reviewers
+from reviewer.email import notify_user_when_review_created
 
 class Command(BaseCommand):
     help = 'Assign reviewers to a manuscript'
@@ -29,13 +30,16 @@ class Command(BaseCommand):
         reviewers = ranked_reviewers(m.authors.all())
         if len(reviewers) >= settings.NUMBER_OF_REVIEWERS:
             days_until_due = options.get('days') or settings.DAYS_TO_REVIEW
-            due_date = timezone.now() + timedelta(days=days_until_due)
+            date_due = timezone.now() + timedelta(days=days_until_due)
             for reviewer in reviewers[:settings.NUMBER_OF_REVIEWERS]:
                 m.reviewers.add(reviewer)
-                m.revisions.last().reviews.create(
+                review = Review(
+                    revision=m.revisions.last(),
                     reviewer=reviewer,
-                    date_due=due_date,
+                    date_due=date_due,
                 )
+                review.save()
+                notify_user_when_review_created(review)
         else:
             msg = "Not enough reviewers for manuscript {}".format(rev.manuscript_id)
             raise CommandError(msg)

@@ -28,6 +28,10 @@
   <div class="explanation">
     <p>Your review is due {{review_deadline}}.</p>
   </div>
+{% elif review.is_submitted %}
+  <div class="explanation">
+    <p>Your review has been submitted.</p>
+  </div>
 {% endif %}
 
 <div class="manuscript-actions">

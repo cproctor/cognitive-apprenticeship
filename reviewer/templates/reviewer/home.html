@@ -13,8 +13,8 @@ manuscripts.</p>
     {% endfor %}
   </div>
   <div class="process-chart-col">
-    <div class="process-chart-cell cell-header">Closed</div>
-    {% for review in reviews_closed %}
+    <div class="process-chart-cell cell-header">Submitted</div>
+    {% for review in reviews_submitted %}
       {% include "reviewer/partials/review_cell.html" %}
     {% endfor %}
     </div><div class="process-chart-col">

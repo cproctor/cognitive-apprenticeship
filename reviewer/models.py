@@ -44,11 +44,23 @@ class Review(models.Model):
         return self.status == self.StatusChoices.EXPIRED
 
     def is_assigned(self):
-        return self.status == self.StatusChoices.ASSIGNED
+        return self.status in [
+            self.StatusChoices.ASSIGNED,
+            self.StatusChoices.EDIT_REQUESTED,
+        ]
+
+    def is_submitted(self):
+        return self.status == self.StatusChoices.SUBMITTED
 
     def get_absolute_url(self):
         return reverse('reviewer:show_review', 
                 args=(self.revision.manuscript_id, self.revision.revision_number))
+            
+    def can_submit(self):
+        return self.status in [
+            self.StatusChoices.ASSIGNED,
+            self.StatusChoices.EDIT_REQUESTED,
+        ]
 
 class ManuscriptReviewer(models.Model):
     manuscript = models.ForeignKey('author.Manuscript', on_delete=models.CASCADE)

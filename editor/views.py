@@ -18,11 +18,11 @@ class EditorRoleRequiredMixin:
         if not request.user.is_authenticated:
             msg = "You must be logged in to view editor pages."
             messages.add_message(request, messages.WARNING, msg)
-            return redirect('home_page')
+            return redirect('public:home_page')
         if not request.user.profile.is_editor:
             msg = "You are not registered as an editor."
             messages.add_message(request, messages.WARNING, msg)
-            return redirect('home_page')
+            return redirect('public:home_page')
         return super().dispatch(request, *args, **kwargs)
 
 class EditorHome(EditorRoleRequiredMixin, TemplateView):

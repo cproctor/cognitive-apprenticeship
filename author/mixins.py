@@ -10,11 +10,11 @@ class AuthorMixin:
         if not request.user.is_authenticated:
             msg = "You must be logged in to view authors pages."
             messages.add_message(request, messages.WARNING, msg)
-            return redirect('home_page')
+            return redirect('public:home_page')
         if not request.user.profile.is_author:
             msg = "You are not registered as an author."
             messages.add_message(request, messages.WARNING, msg)
-            return redirect('home_page')
+            return redirect('public:home_page')
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):

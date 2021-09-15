@@ -1,5 +1,4 @@
 from common.state_machine import StateMachine
-from common.email import send_journal_email
 from django.contrib import messages
 from django.conf import settings
 from datetime import datetime, timedelta
@@ -9,6 +8,11 @@ from reviewer.models import Review
 from reviewer.state_machine import ReviewStateMachine
 from reviewer.assignment import ranked_reviewers
 from reviewer.email import notify_user_when_review_created
+from author.email import (
+    notify_user_revision_transitioned_from_unsubmitted_to_waiting_for_authors,
+    notify_user_revision_transitioned_from_unsubmitted_to_pending,
+    notify_user_revision_transitioned_from_pending_to_decided,
+)
 
 logger = logging.getLogger("cognitive_apprenticeship.analytics")
 main_logger = logging.getLogger(__name__)
@@ -25,6 +29,7 @@ class RevisionStateMachine(StateMachine):
         self.log_state_transition(rev, old_state, new_state)
         rev.status = self.states.WAITING_FOR_AUTHORS
         rev.save()
+        notify_user_revision_transitioned_from_unsubmitted_to_waiting_for_authors(rev)
             
     def unsubmitted_to_pending(self, rev, old_state, new_state):
         self.log_state_transition(rev, old_state, new_state)
@@ -33,11 +38,7 @@ class RevisionStateMachine(StateMachine):
         rev.status = new_state
         rev.date_submitted = datetime.now()
         rev.save()
-        send_journal_email(
-            "You submitted a manuscript: '{}'".format(rev.title),
-            UNSUBMITTED_TO_PENDING_EMAIL,
-            rev.manuscript.authors.all()
-        )
+        notify_user_revision_transitioned_from_unsubmitted_to_pending(rev)
         if settings.AUTOMATICALLY_ASSIGN_REVIEWERS:
             reviewers = ranked_reviewers(rev.manuscript.authors.all())
             if len(reviewers) >= settings.NUMBER_OF_REVIEWERS:
@@ -57,7 +58,7 @@ class RevisionStateMachine(StateMachine):
 
     def waiting_for_authors_to_unsubmitted(self, rev, old_state, new_state):
         self.log_state_transition(rev, old_state, new_state)
-        self.flash_authors(rev, "All authors have now acknowledged authorship of {}.")
+        self.flash_authors(rev, "All authors have now acknowledged authorship of {}.".format(rev.title))
         rev.status = new_state
         rev.save()
 
@@ -96,11 +97,7 @@ class RevisionStateMachine(StateMachine):
         rev.status = new_state
         rev.date_decided = datetime.now()
         rev.save()
-        send_journal_email(
-            "Your manuscript has a decision",
-            DECISION_TRANSITION_EMAIL.format(rev.title),
-            rev.manuscript.authors.all()
-        )
+        notify_user_revision_transitioned_from_pending_to_decided(rev)
 
     def log_state_transition(self, rev, old_state, new_state):
         msg = "Revision {} transitioned from {} to {}".format(rev.id, old_state, new_state)
@@ -138,11 +135,3 @@ class RevisionStateMachine(StateMachine):
         }
     }
 
-    
-UNSUBMITTED_TO_PENDING_EMAIL = """Reviewers have been assigned to your
-manuscript. You will be notified once the reviews have been received.
-Thanks!
-"""
-DECISION_TRANSITION_EMAIL = """The reviews are in and a decision has been
-returned for your manuscript, "{}."
-"""

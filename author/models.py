@@ -115,7 +115,7 @@ class Revision(models.Model):
     date_decided = models.DateTimeField(blank=True, null=True)
     date_published = models.DateTimeField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=StatusChoices.choices,
-            default=StatusChoices.PENDING)
+            default=StatusChoices.UNSUBMITTED)
 
     def __str__(self):
         return '"{}" by {} (v{} {})'.format(
@@ -180,7 +180,6 @@ class Revision(models.Model):
             self.status == self.StatusChoices.PENDING and
             not self.has_reviews_underway()
         )
-
     def can_create_new_revision(self):
         valid_statuses = [
             self.StatusChoices.WITHDRAWN,

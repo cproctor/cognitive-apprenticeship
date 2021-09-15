@@ -51,17 +51,15 @@ class NewManuscript(AuthorMixin, FormView):
                     )
                     for author in form.cleaned_data['additional_authors']:
                         manuscript.authors.add(author)
-                    if manuscript.has_unacknowledged_authors():
-                        status = Revision.StatusChoices.WAITING_FOR_AUTHORS
-                    else:
-                        status = Revision.StatusChoices.UNSUBMITTED
                     revision = manuscript.revisions.create(
                         revision_number=0,
                         title=form.cleaned_data['title'],
                         text=form.cleaned_data['text'],
                         date_created=datetime.now(),
-                        status=status,
                     )
+                    if manuscript.has_unacknowledged_authors():
+                        sm = RevisionStateMachine()
+                        sm.transition(revision, sm.states.WAITING_FOR_AUTHORS)
                 return redirect('author:show_revision', manuscript_pk=manuscript.id,
                         revision_number=revision.revision_number)
             except DatabaseError:
@@ -101,14 +99,14 @@ class ShowRevision(AuthorMixin, ManuscriptRevisionMixin, DetailView):
                 "acknowledged authorship. They need to do this before " + 
                 "the manuscript can be submitted."
             )
-            c['missing_authors_message'] = missing_msg.format(m.format_author_names(missing_authors))
+            c['missing_authors_message'] = missing_msg.format(m.format_names(missing_authors))
         elif len(missing_authors) > 1:
             missing_msg = (
                 "{} are listed as authors but have not yet " + 
                 "acknowledged authorship. They each need to do this before " + 
                 "the manuscript can be submitted."
             )
-            c['missing_authors_message'] = missing_msg.format(m.format_author_names(missing_authors))
+            c['missing_authors_message'] = missing_msg.format(m.format_names(missing_authors))
             c['withdrawal_forbidden_because_reviews_underway'] = (
                 self.self.status == self.StatusChoices.PENDING and 
                 self.has_reviews_underway()
@@ -140,8 +138,9 @@ class ShowRevision(AuthorMixin, ManuscriptRevisionMixin, DetailView):
                 return self.forbid_action("withdraw")
         elif action == "ACKNOWLEDGE AUTHORSHIP":
             if self.can_acknowledge_authorship():
-                self.acknowledge_authorship(self)
+                self.acknowledge_authorship()
                 sm.transition(revision, sm.states.UNSUBMITTED)
+                return redirect_to_revision
             else:
                 return self.forbid_action("acknowledge authorship")
         elif action == "CREATE A NEW REVISION":

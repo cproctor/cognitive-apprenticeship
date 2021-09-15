@@ -12,11 +12,11 @@ class ReviewerMixin:
         if not request.user.is_authenticated:
             msg = "You must be logged in to view reviewer pages."
             messages.add_message(request, messages.WARNING, msg)
-            return redirect('home_page')
+            return redirect('public:home_page')
         if not request.user.profile.is_reviewer:
             msg = "You are not registered as a reviewer."
             messages.add_message(request, messages.WARNING, msg)
-            return redirect('home_page')
+            return redirect('public:home_page')
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):

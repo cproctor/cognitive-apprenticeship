@@ -9,6 +9,7 @@ from django.shortcuts import redirect
 from .models import Review
 from .mixins import ReviewerMixin, RevisionReviewMixin
 from .forms import EditReviewForm
+from .state_machine import ReviewStateMachine
 
 class ReviewerHome(ReviewerMixin, TemplateView):
     template_name = "reviewer/home.html"
@@ -20,17 +21,18 @@ class ReviewerHome(ReviewerMixin, TemplateView):
         assigned_statuses = [
             Review.StatusChoices.ASSIGNED,
             Review.StatusChoices.EDIT_REQUESTED,
+            Review.StatusChoices.WITHDRAWN,
+            Review.StatusChoices.EXPIRED,
         ]
         c['reviews_assigned'] = (my_reviews
             .filter(status__in=assigned_statuses)
             .filter(revision__status=Revision.StatusChoices.PENDING)
             .all()
         )
-        closed_statuses = [
-            Review.StatusChoices.EXPIRED,
-            Review.StatusChoices.WITHDRAWN,
+        submitted_statuses = [
+            Review.StatusChoices.SUBMITTED,
         ]
-        c['reviews_closed'] = my_reviews.filter(status__in=closed_statuses).all()
+        c['reviews_submitted'] = my_reviews.filter(status__in=submitted_statuses).all()
         c['reviews_complete'] = my_reviews.filter(status=Review.StatusChoices.COMPLETE).all()
         return c
 
@@ -67,6 +69,27 @@ class ShowReview(ReviewerMixin, ManuscriptRevisionMixin, RevisionReviewMixin, De
             return redirect('reviewer:edit_review', m_id, self.get_revision().revision_number)
         else:
             return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        "Handles POST actions"
+        review = self.get_review()
+        sm = ReviewStateMachine(request)
+        action = request.POST['action'].upper()
+        if action == "SUBMIT":
+            try:
+                sm.transition(review, sm.states.SUBMITTED)
+            except sm.IllegalTransition:
+                return self.forbid_action("submit")
+        else:
+            return self.forbid_action(action)
+        m_id = self.get_revision().manuscript_id
+        return redirect('reviewer:review_detail', m_id, self.get_revision().revision_number)
+
+    def forbid_action(self, action):
+        msg = "Action '{}' is not allowed.".format(action)
+        messages.add_message(self.request, messages.WARNING, msg)
+        return HttpResponseForbidden(msg)
+        
 
 class ShowReviewInstructions(ReviewerMixin, ManuscriptRevisionMixin, TemplateView):
     """Implements the review instructions tab."""

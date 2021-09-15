@@ -18,6 +18,13 @@
       <button>Edit review</button>
     </a>
   {% endif %}
+  {% if review.can_submit %}
+    <form method="post" action="{% url 'reviewer:show_review' manuscript.pk revision.revision_number %}">
+      {% csrf_token %}
+      <input type="submit" name="action" value="Submit">
+    </form>
+
+  {% endif %}
   <hr>
   {{review.text|safe}}
   <p class="decision">Recommendation: {{review.recommendation}}</p>

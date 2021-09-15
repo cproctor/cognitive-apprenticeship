@@ -110,6 +110,9 @@ article.revision {
 .explanation {
   font-style: italic;
 }
+.bold {
+  font-weight: bold;
+}
 .decision {
   font-style: italic;
 }

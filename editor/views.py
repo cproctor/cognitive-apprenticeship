@@ -11,6 +11,7 @@ from editor.forms import AssignReviewerForm
 from datetime import datetime, timedelta
 from .models import JournalIssue
 from .forms import NewJournalIssueForm, EditJournalIssueForm
+from reviewer.email import notify_user_when_review_created
 
 class EditorRoleRequiredMixin:
     def dispatch(self, request, *args, **kwargs):
@@ -89,12 +90,13 @@ class ShowEditorManuscript(EditorRoleRequiredMixin, DetailView):
                 user = form.cleaned_data['reviewer']
                 manuscript.reviewers.add(user)
                 if not Review.objects.filter(revision__manuscript=manuscript, reviewer=user).exists():
-                    Review.objects.create(
+                    review = Review.objects.create(
                         reviewer=user,
                         revision=manuscript.revisions.last(),
                         status=Review.StatusChoices.ASSIGNED,
                         date_due=datetime.now() + timedelta(days=settings.DAYS_TO_REVIEW)
                     )
+                    notify_user_when_review_created(review)
                 return redirect('editor:show_manuscript', manuscript.id)
             else:
                 context['assign_reviewer_form'] = form

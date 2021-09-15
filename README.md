@@ -31,12 +31,6 @@ TODO
 
 - Email templates
 
-## NEXT UP
-
-- Extend usage of the manuscript layout to all author pages
-- Build out a reviewer page
-- Build a tiled interface for listing manuscripts, reviews. 
-- Add a tab to show reviews--only when the manuscript is decided.
 
 ## Documentation
 

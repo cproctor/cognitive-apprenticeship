@@ -1,11 +1,16 @@
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
+from django.views.generic.edit import CreateView, UpdateView, FormView
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.conf import settings
 from author.models import Manuscript, Revision
 from reviewer.models import Review
 from editor.forms import AssignReviewerForm
 from datetime import datetime, timedelta
+from .models import JournalIssue
+from .forms import NewJournalIssueForm, EditJournalIssueForm
 
 class EditorRoleRequiredMixin:
     def dispatch(self, request, *args, **kwargs):
@@ -100,13 +105,34 @@ class ShowEditorManuscript(EditorRoleRequiredMixin, DetailView):
             manuscript.reviewers.remove(user)
             return redirect('editor:show_manuscript', manuscript.id)
 
-            
-
-
 class ListEditorReviews(EditorRoleRequiredMixin, TemplateView):
     template_name = "editor/list_reviews.html"
 
 
+class ListIssues(EditorRoleRequiredMixin, ListView):
+    model = JournalIssue
+    template_name = "editor/list_issues.html"
+    context_object_name = "issues"
+
+class ShowIssue(EditorRoleRequiredMixin, DetailView):
+    model = JournalIssue
+    template_name = "editor/issue_detail.html"
+    context_object_name = "issue"
+
+class NewIssue(EditorRoleRequiredMixin, CreateView):
+    model = JournalIssue
+    form_class = NewJournalIssueForm
+    template_name = "editor/new_issue.html"
+
+    def get_success_url(self):
+        return reverse('editor:show_issue', args=(self.object.id,))
+
+class EditIssue(EditorRoleRequiredMixin, UpdateView):
+    model = JournalIssue
+    form_class = EditJournalIssueForm
+    template_name = "editor/edit_issue.html"
+    context_object_name = "issue"
+    
 
 
 

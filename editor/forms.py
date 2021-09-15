@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
-from author.models import Manuscript
+from author.models import Manuscript, Revision
+from .models import JournalIssue
 
 class AssignReviewerForm(forms.Form):
     """A form for adding a User as a reviewer.
@@ -19,3 +20,23 @@ class AssignReviewerForm(forms.Form):
 
     def num_possible_reviewers(self):
         return bool(len(self.possible_reviewers))
+
+class NewJournalIssueForm(forms.ModelForm):
+    
+    class Meta:
+        model = JournalIssue
+        fields = ['title', 'introduction', 'volume', 'number']
+
+class EditJournalIssueForm(forms.ModelForm):
+    
+    manuscripts = forms.ModelMultipleChoiceField(
+        queryset=Manuscript.objects.filter(revisions__status__in=[
+            Revision.StatusChoices.ACCEPT, 
+            Revision.StatusChoices.PUBLISHED,
+        ]),
+        widget=forms.CheckboxSelectMultiple,
+    )
+
+    class Meta:
+        model = JournalIssue
+        fields = ['title', 'introduction', 'volume', 'number', 'published', 'manuscripts']

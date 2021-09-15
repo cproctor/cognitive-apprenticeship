@@ -108,7 +108,6 @@ class ShowEditorManuscript(EditorRoleRequiredMixin, DetailView):
 class ListEditorReviews(EditorRoleRequiredMixin, TemplateView):
     template_name = "editor/list_reviews.html"
 
-
 class ListIssues(EditorRoleRequiredMixin, ListView):
     model = JournalIssue
     template_name = "editor/list_issues.html"

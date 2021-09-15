@@ -123,14 +123,25 @@ LOGGING = {
             'level': 'INFO',
             'filename': 'analytics.log',
             'formatter': 'json'
-        }
+        },
+        'email': {
+            'class': 'logging.FileHandler',
+            'level': 'INFO',
+            'filename': 'email.log',
+            'formatter': 'json'
+        },
     },
     'loggers': {
         'cognitive_apprenticeship.analytics': {
             'handlers': ['analytics'],
             'level': 'INFO',
             'propagate': True,
-        }
+        },
+        'cognitive_apprenticeship.email': {
+            'handlers': ['email'],
+            'level': 'INFO',
+            'propagate': True,
+        },
     }
 }
 
@@ -173,5 +184,9 @@ DAYS_TO_EDIT_REVIEW = 3
 DAYS_ON_EXTENSION = 1
 NUMBER_OF_REVIEWERS = 2
 AUTOMATICALLY_ASSIGN_REVIEWERS = True
+
+SEND_JOURNAL_EMAIL = False
+JOURNAL_EMAIL_SUBJECT_PREFIX = "[CISL Journal] "
+JOURNAL_EMAIL_SENDER = "chris.proctor@gmail.com"
 
 EMAIL_SUBJECT_PREFIX = "[CISL Journal] "

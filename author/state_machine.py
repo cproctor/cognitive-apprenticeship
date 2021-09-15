@@ -1,4 +1,5 @@
 from common.state_machine import StateMachine
+from common.email import send_journal_email
 from django.contrib import messages
 from django.conf import settings
 from datetime import datetime, timedelta
@@ -31,6 +32,11 @@ class RevisionStateMachine(StateMachine):
         rev.status = new_state
         rev.date_submitted = datetime.now()
         rev.save()
+        send_journal_email(
+            "You submitted a manuscript: '{}'".format(rev.title),
+            UNSUBMITTED_TO_PENDING_EMAIL,
+            rev.manuscript.authors.all()
+        )
         if settings.AUTOMATICALLY_ASSIGN_REVIEWERS:
             reviewers = ranked_reviewers(rev.manuscript.authors.all())
             if len(reviewers) >= settings.NUMBER_OF_REVIEWERS:
@@ -86,6 +92,11 @@ class RevisionStateMachine(StateMachine):
         rev.status = new_state
         rev.date_decided = datetime.now()
         rev.save()
+        send_journal_email(
+            "Your manuscript has a decision",
+            DECISION_TRANSITION_EMAIL.format(rev.title),
+            rev.manuscript.authors.all()
+        )
 
     def log_state_transition(self, rev, old_state, new_state):
         msg = "Revision {} transitioned from {} to {}".format(rev.id, old_state, new_state)
@@ -124,3 +135,10 @@ class RevisionStateMachine(StateMachine):
     }
 
     
+UNSUBMITTED_TO_PENDING_EMAIL = """Reviewers have been assigned to your
+manuscript. You will be notified once the reviews have been received.
+Thanks!
+"""
+DECISION_TRANSITION_EMAIL = """The reviews are in and a decision has been
+returned for your manuscript, "{}."
+"""

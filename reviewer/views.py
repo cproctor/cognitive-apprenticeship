@@ -90,8 +90,7 @@ class ShowReview(ReviewerMixin, ManuscriptRevisionMixin, RevisionReviewMixin, De
         messages.add_message(self.request, messages.WARNING, msg)
         return HttpResponseForbidden(msg)
         
-
-class ShowReviewInstructions(ReviewerMixin, ManuscriptRevisionMixin, TemplateView):
+class ReviewInstructions(ReviewerMixin, ManuscriptRevisionMixin, RevisionReviewMixin, TemplateView):
     """Implements the review instructions tab."""
     template_name = "reviewer/review_instructions.html"
 

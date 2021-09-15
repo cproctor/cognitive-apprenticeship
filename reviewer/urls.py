@@ -12,6 +12,8 @@ urlpatterns = [
             views.ShowReviews.as_view(), name='show_reviews'),
     path('manuscripts/<int:manuscript_pk>/versions/<int:revision_number>/review', 
             views.ShowReview.as_view(), name='show_review'),
+    path('manuscripts/<int:manuscript_pk>/versions/<int:revision_number>/review/instructions', 
+            views.ReviewInstructions.as_view(), name='review_instructions'),
     path('manuscripts/<int:manuscript_pk>/versions/<int:revision_number>/review/edit', 
             views.EditReview.as_view(), name='edit_review'),
 ]

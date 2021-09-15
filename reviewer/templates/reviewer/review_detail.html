@@ -8,11 +8,13 @@
   <div class="tab current">
     Review
   </div>
+  <div class="tab">
+    <a href="{% url 'reviewer:review_instructions' manuscript.pk revision.revision_number %}">Instructions</a>
+  </div>
 </div>
 {% endblock %}
 
 {% block manuscript_text %}
-  {% include "reviewer/partials/instructions.html" %}
   {% if review.is_assigned %}
     <a href="{% url 'reviewer:edit_review' manuscript.pk revision.revision_number %}">
       <button>Edit review</button>
@@ -25,7 +27,6 @@
     </form>
 
   {% endif %}
-  <hr>
   {{review.text|safe}}
   <p class="decision">Recommendation: {{review.recommendation}}</p>
 {% endblock %}

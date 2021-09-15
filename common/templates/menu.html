@@ -1,7 +1,7 @@
 <nav id="menu">
 	<div class="menu-left">
 		<div class="menu-item{% if menu_section == 'public' %} current{% endif %}">
-      <a href="{% url 'home_page' %}">Home</a>
+      <a href="{% url 'public:home_page' %}">Home</a>
     </div>
 		{% if user.is_authenticated %}
 		  {% if user.profile.is_author %}

@@ -1,41 +1,53 @@
-{% extends "author/manuscript_revision.html" %}
+{% extends "reviewer/base.html" %}
 
-{% block menu %}
-  {% with menu_section="reviewer" %}
-    {% include "menu.html" %}
-  {% endwith %}
-{% endblock %}
-
-{% block submenu %}
-  {% include "reviewer/partials/submenu.html" %}
-{% endblock %}
-
-{% block sidebar %}
-  {% with current_revision=revision %}
-    {% for revision in manuscript.revisions.all %}
-      {% include "reviewer/partials/revision_summary.html" %}
-    {% endfor %}
-  {% endwith %}
-{% endblock %}
-
-{% block manuscript_header %}
-<h1>{{revision.title}}</h1>
-{% if review.is_expired %}
-  <div class="explanation">
-    <p>The deadline has passed for this review. Please contact the editor to request an extension.</p>
-  </div>
-{% elif review.is_assigned %}
-  <div class="explanation">
-    <p>Your review is due {{review_deadline}}.</p>
-  </div>
-{% elif review.is_submitted %}
-  <div class="explanation">
-    <p>Your review has been submitted.</p>
-  </div>
-{% endif %}
-
-<div class="manuscript-actions">
-  {% block manuscript_actions %}
+{% block content %}
+<div id="manuscript-layout">
+  <div class="manuscript-sidebar">
+  {% block sidebar %}
+    {% with current_revision=revision %}
+      {% for revision in manuscript.revisions.all %}
+        {% include "reviewer/partials/revision_summary.html" %}
+      {% endfor %}
+    {% endwith %}
   {% endblock %}
+  </div>
+  <div class="manuscript-content">
+    {% block manuscript_content %}
+    <div class="manuscript-header">
+      {% block manuscript_header %}
+      <h1>{{revision.title}}</h1>
+      {% if review.is_expired %}
+        <div class="explanation">
+          <p>The deadline has passed for this review. Please contact the editor to request an extension.</p>
+        </div>
+      {% elif review.is_assigned %}
+        <div class="explanation">
+          <p>Your review is due {{review_deadline}}.</p>
+        </div>
+      {% elif review.is_submitted %}
+        <div class="explanation">
+          <p>Your review has been submitted.</p>
+        </div>
+      {% endif %}
+      <div class="manuscript-actions">
+        {% block manuscript_actions %}
+        {% endblock %}
+      </div>
+      {% endblock %}
+    </div>
+    {% block manuscript_divider %}
+    <div class="manuscript-revision-tabs">
+      <div class="tab current">
+        Text
+      </div>
+    </div>
+    {% endblock %}
+    <div class="manuscript-text">
+      {% block manuscript_text %}
+        {{revision.text|safe}}
+      {% endblock %}
+    </div>
+    {% endblock %}
+  </div>
 </div>
 {% endblock %}

@@ -69,12 +69,12 @@ class Review(models.Model):
         COMPLETE = auto()
         
     KANBAN_ASSIGNMENT = {
-        StatusChoices.ASSIGNED: KanbanColumns.ASSIGNED,
-        StatusChoices.EDIT_REQUESTED: KanbanColumns.ASSIGNED,
-        StatusChoices.WITHDRAWN: KanbanColumns.ASSIGNED,
-        StatusChoices.EXPIRED: KanbanColumns.ASSIGNED,
-        StatusChoices.SUBMITTED: KanbanColumns.SUBMITTED,
-        StatusChoices.COMPLETE: KanbanColumns.COMPLETE,
+        StatusChoices.ASSIGNED:         KanbanColumns.ASSIGNED,
+        StatusChoices.EDIT_REQUESTED:   KanbanColumns.ASSIGNED,
+        StatusChoices.WITHDRAWN:        KanbanColumns.ASSIGNED,
+        StatusChoices.EXPIRED:          KanbanColumns.ASSIGNED,
+        StatusChoices.SUBMITTED:        KanbanColumns.SUBMITTED,
+        StatusChoices.COMPLETE:         KanbanColumns.COMPLETE,
     }
 
     def kanban_column(self):

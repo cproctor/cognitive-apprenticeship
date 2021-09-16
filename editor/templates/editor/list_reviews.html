@@ -1,0 +1,33 @@
+{% extends "editor/base.html" %}
+
+{% block content %}
+<h1>Reviews</h1>
+<form method="get" action="{% url 'editor:list_reviews' %}">
+  <input type="text" name="q">
+  <input type="submit" value="Search by username">
+</form>
+<hr>
+<div class="process-chart">
+	<div class="process-chart-col">
+		<div class="process-chart-cell cell-header">Assigned</div>
+		{% for manuscript in unsubmitted_manuscripts %}
+		  {% include "editor/partials/manuscript_cell.html" %}
+		{% endfor %}
+	</div>
+    <div class="process-chart-col">
+		<div class="process-chart-cell cell-header">Submitted</div>
+		{% for manuscript in pending_manuscripts %}
+		  {% include "editor/partials/manuscript_cell.html" %}
+		{% endfor %}
+	</div>
+    <div class="process-chart-col">
+		<div class="process-chart-cell cell-header">Complete</div>
+		{% for manuscript in decided_manuscripts %}
+		  {% include "editor/partials/manuscript_cell.html" %}
+		{% endfor %}
+	</div>
+</div>
+{% endblock %}
+
+
+

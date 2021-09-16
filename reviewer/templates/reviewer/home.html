@@ -8,18 +8,18 @@ manuscripts.</p>
 <div class="process-chart">
   <div class="process-chart-col">
     <div class="process-chart-cell cell-header">Assigned</div>
-    {% for review in reviews_assigned %}
+    {% for review in ASSIGNED %}
       {% include "reviewer/partials/review_cell.html" %}
     {% endfor %}
   </div>
   <div class="process-chart-col">
     <div class="process-chart-cell cell-header">Submitted</div>
-    {% for review in reviews_submitted %}
+    {% for review in SUBMITTED %}
       {% include "reviewer/partials/review_cell.html" %}
     {% endfor %}
     </div><div class="process-chart-col">
     <div class="process-chart-cell cell-header">Complete</div>
-    {% for review in reviews_complete %}
+    {% for review in COMPLETE %}
       {% include "reviewer/partials/review_cell.html" %}
     {% endfor %}
     </div>

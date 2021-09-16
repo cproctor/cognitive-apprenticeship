@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+from enum import Enum, auto
 
 class ReviewManager(models.Manager):
     def for_manuscript(self, manuscript):
@@ -61,6 +62,27 @@ class Review(models.Model):
             self.StatusChoices.ASSIGNED,
             self.StatusChoices.EDIT_REQUESTED,
         ]
+
+    class KanbanColumns(Enum):
+        ASSIGNED = auto()
+        SUBMITTED = auto()
+        COMPLETE = auto()
+        
+    KANBAN_ASSIGNMENT = {
+        StatusChoices.ASSIGNED: KanbanColumns.ASSIGNED,
+        StatusChoices.EDIT_REQUESTED: KanbanColumns.ASSIGNED,
+        StatusChoices.WITHDRAWN: KanbanColumns.ASSIGNED,
+        StatusChoices.EXPIRED: KanbanColumns.ASSIGNED,
+        StatusChoices.SUBMITTED: KanbanColumns.SUBMITTED,
+        StatusChoices.COMPLETE: KanbanColumns.COMPLETE,
+    }
+
+    def kanban_column(self):
+        return self.KANBAN_ASSIGNMENT[self.status]
+
+    @classmethod
+    def in_kanban_columns(self, reviews):
+        return {col: [r for r in reviews if r.kanban_column() == col] for col in self.KanbanColumns}
 
 class ManuscriptReviewer(models.Model):
     manuscript = models.ForeignKey('author.Manuscript', on_delete=models.CASCADE)

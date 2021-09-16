@@ -110,6 +110,41 @@ class ShowEditorManuscript(EditorRoleRequiredMixin, DetailView):
 class ListEditorReviews(EditorRoleRequiredMixin, TemplateView):
     template_name = "editor/list_reviews.html"
 
+    def get_context_data(self, **kwargs):
+        c = super().get_context_data(**kwargs)
+
+        unsubmitted = []
+        pending = []
+        decided = []
+        published = []
+
+        qs = Review.objects
+        if 'q' in self.request.GET:
+            qs = qs.filter(reviewer__username=self.request.GET['q'])
+        qs = qs.count_reviews('num_reviews')
+        qs = qs.count_reviews('num_complete_reviews', status=Review.StatusChoices.COMPLETE)
+
+        bins = {
+            Revision.StatusChoices.UNSUBMITTED: unsubmitted,
+            Revision.StatusChoices.WAITING_FOR_AUTHORS: unsubmitted,
+            Revision.StatusChoices.WITHDRAWN: unsubmitted,
+            Revision.StatusChoices.PENDING: pending,
+            Revision.StatusChoices.ACCEPT: decided,
+            Revision.StatusChoices.MAJOR_REVISION: decided,
+            Revision.StatusChoices.REJECT: decided,
+            Revision.StatusChoices.PUBLISHED: published,
+        }
+        for m in qs.all():
+            r = m.revisions.last() # TODO Poor performance; prefetch
+            bins[r.status].append(m)
+
+        c['unsubmitted_manuscripts'] = unsubmitted
+        c['pending_manuscripts'] = pending
+        c['decided_manuscripts'] = decided
+        c['published_manuscripts'] = published
+
+        return c
+       
 class ListIssues(EditorRoleRequiredMixin, ListView):
     model = JournalIssue
     template_name = "editor/list_issues.html"

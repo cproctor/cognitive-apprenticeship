@@ -16,24 +16,9 @@ class ReviewerHome(ReviewerMixin, TemplateView):
 
     def get_context_data(self):
         c = super().get_context_data()
-        my_reviews = Review.objects.filter(reviewer=self.request.user)
-
-        assigned_statuses = [
-            Review.StatusChoices.ASSIGNED,
-            Review.StatusChoices.EDIT_REQUESTED,
-            Review.StatusChoices.WITHDRAWN,
-            Review.StatusChoices.EXPIRED,
-        ]
-        c['reviews_assigned'] = (my_reviews
-            .filter(status__in=assigned_statuses)
-            .filter(revision__status=Revision.StatusChoices.PENDING)
-            .all()
-        )
-        submitted_statuses = [
-            Review.StatusChoices.SUBMITTED,
-        ]
-        c['reviews_submitted'] = my_reviews.filter(status__in=submitted_statuses).all()
-        c['reviews_complete'] = my_reviews.filter(status=Review.StatusChoices.COMPLETE).all()
+        my_reviews = Review.objects.filter(reviewer=self.request.user).all()
+        for col, reviews in Review.in_kanban_columns(my_reviews).items():
+            c[col.name] = reviews
         return c
 
 class ShowManuscript(ReviewerMixin, DetailView):

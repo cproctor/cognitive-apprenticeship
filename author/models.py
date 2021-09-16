@@ -5,6 +5,7 @@ from django.urls import reverse
 from tinymce.models import HTMLField
 from common.models import NondeletedManager
 from django.db.models import Q, Count
+from enum import Enum, auto
 
 class ManuscriptQuerySet(models.QuerySet):
     def count_reviews(self, name, **kwargs):
@@ -62,27 +63,12 @@ class Manuscript(models.Model):
     def status_message(self):
         return self.revisions.last().status_message()
 
-    def process_stage(self):
-        """Manuscripts go through the following process stages:
-          - In preparation
-          - In submission
-          - Decided
-          - Published or in press
-          Only used for presentation layer. StateMachine handles transitions.
-        """
-        process_stages = {
-            Revision.StatusChoices.UNSUBMITTED:         "in preparation",
-            Revision.StatusChoices.WAITING_FOR_AUTHORS: "in preparation",
-            Revision.StatusChoices.WITHDRAWN:           "in preparation",
-            Revision.StatusChoices.PENDING:             "in submission",
-            Revision.StatusChoices.ACCEPT:              "published",
-            Revision.StatusChoices.MINOR_REVISION:      "decided",
-            Revision.StatusChoices.MAJOR_REVISION:      "decided",
-            Revision.StatusChoices.REJECT:              "decided",
-            Revision.StatusChoices.PUBLISHED:           "published",
-        }
-        last_revision_status = self.revisions.last().status
-        return process_stages[last_revision_status]
+    def kanban_column(self):
+        return Revision.KANBAN_ASSIGNMENT[self.revisions.last().status]
+
+    @classmethod
+    def in_kanban_columns(self, manuscripts):
+        return {col: [m for m in manuscripts if m.kanban_column() == col] for col in Revision.KanbanColumns}
 
 class ManuscriptAuthorship(models.Model):
     manuscript = models.ForeignKey(Manuscript, on_delete=models.CASCADE,
@@ -196,6 +182,28 @@ class Revision(models.Model):
         ]
         return self.status in valid_statuses
 
+    class KanbanColumns(Enum):
+        IN_PREPARATION = auto()
+        IN_SUBMISSION = auto()
+        DECIDED = auto()
+        PUBLISHED = auto()
 
+    KANBAN_ASSIGNMENT = {
+        StatusChoices.UNSUBMITTED:          KanbanColumns.IN_PREPARATION,
+        StatusChoices.WAITING_FOR_AUTHORS:  KanbanColumns.IN_PREPARATION,
+        StatusChoices.WITHDRAWN:            KanbanColumns.IN_PREPARATION,
+        StatusChoices.PENDING:              KanbanColumns.IN_SUBMISSION,
+        StatusChoices.MINOR_REVISION:       KanbanColumns.DECIDED,
+        StatusChoices.MAJOR_REVISION:       KanbanColumns.DECIDED,
+        StatusChoices.REJECT:               KanbanColumns.DECIDED,
+        StatusChoices.ACCEPT:               KanbanColumns.PUBLISHED,
+        StatusChoices.PUBLISHED:            KanbanColumns.PUBLISHED,
+    }
 
+    def kanban_column(self):
+        return self.KANBAN_ASSIGNMENT[self.revisions.last().status]
+
+    @classmethod
+    def in_kanban_columns(self, revisions):
+        return {col: [r for r in revisions if r.kanban_column() == col] for col in self.KanbanColumns}
 

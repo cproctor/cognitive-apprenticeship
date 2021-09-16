@@ -10,22 +10,22 @@
 <div class="process-chart">
 	<div class="process-chart-col">
 		<div class="process-chart-cell cell-header">Unsubmitted</div>
-		{% for manuscript in unsubmitted_manuscripts %}
+		{% for manuscript in IN_PREPARATION %}
 		  {% include "editor/partials/manuscript_cell.html" %}
 		{% endfor %}
 	</div><div class="process-chart-col">
 		<div class="process-chart-cell cell-header">Pending</div>
-		{% for manuscript in pending_manuscripts %}
+		{% for manuscript in IN_SUBMISSION %}
 		  {% include "editor/partials/manuscript_cell.html" %}
 		{% endfor %}
 	</div><div class="process-chart-col">
 		<div class="process-chart-cell cell-header">Decided</div>
-		{% for manuscript in decided_manuscripts %}
+		{% for manuscript in DECIDED %}
 		  {% include "editor/partials/manuscript_cell.html" %}
 		{% endfor %}
 	</div><div class="process-chart-col">
 		<div class="process-chart-cell cell-header">Published</div>
-		{% for manuscript in published_manuscripts %}
+		{% for manuscript in PUBLISHED %}
 		  {% include "editor/partials/manuscript_cell.html" %}
 		{% endfor %}
 	</div>

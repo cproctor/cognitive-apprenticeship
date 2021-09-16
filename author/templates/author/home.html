@@ -11,25 +11,25 @@
           <a href="{% url 'author:new_manuscript' %}">Start a new manuscript</a>
         </p>
       </article>
-      {% for manuscript in manuscripts_in_preparation %}
+      {% for manuscript in IN_PREPARATION %}
         {% include "author/partials/manuscript_cell.html" %}
       {% endfor %}
   </div>
   <div class="process-chart-col">
     <div class="process-chart-cell cell-header">In submission</div>
-    {% for manuscript in manuscripts_in_submission %}
+    {% for manuscript in IN_SUBMISSION %}
       {% include "author/partials/manuscript_cell.html" %}
     {% endfor %}
   </div>
   <div class="process-chart-col">
     <div class="process-chart-cell cell-header">Decided</div>
-    {% for manuscript in manuscripts_decided %}
+    {% for manuscript in DECIDED %}
       {% include "author/partials/manuscript_cell.html" %}
     {% endfor %}
   </div>
   <div class="process-chart-col">
     <div class="process-chart-cell cell-header">Published</div>
-    {% for manuscript in manuscripts_published %}
+    {% for manuscript in PUBLISHED %}
       {% include "author/partials/manuscript_cell.html" %}
     {% endfor %}
   </div>

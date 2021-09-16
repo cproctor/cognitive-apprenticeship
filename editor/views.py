@@ -34,7 +34,7 @@ class ListEditorManuscripts(EditorRoleRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         c = super().get_context_data(**kwargs)
         qs = Manuscript.objects
-        if 'q' in self.request.GET:
+        if 'q' in self.request.GET and self.request.GET['q']:
             qs = qs.filter(authors__username=self.request.GET['q'])
         qs = qs.count_reviews('num_reviews')
         qs = qs.count_reviews('num_complete_reviews', status=Review.StatusChoices.COMPLETE)
@@ -89,7 +89,7 @@ class ListEditorReviews(EditorRoleRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         c = super().get_context_data(**kwargs)
         qs = Review.objects
-        if 'q' in self.request.GET:
+        if 'q' in self.request.GET and self.request.GET['q']:
             qs = qs.filter(reviewer__username=self.request.GET['q'])
         for col, reviews in Review.in_kanban_columns(qs.all()).items():
             c[col.name] = reviews

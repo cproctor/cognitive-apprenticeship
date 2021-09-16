@@ -5,6 +5,8 @@ from author.models import Manuscript, Revision
 from author.mixins import ManuscriptRevisionMixin
 from django.urls import reverse
 from django.shortcuts import redirect
+from django.contrib import messages
+from django.http import HttpResponseForbidden
 
 from .models import Review
 from .mixins import ReviewerMixin, RevisionReviewMixin
@@ -68,7 +70,7 @@ class ShowReview(ReviewerMixin, ManuscriptRevisionMixin, RevisionReviewMixin, De
         else:
             return self.forbid_action(action)
         m_id = self.get_revision().manuscript_id
-        return redirect('reviewer:review_detail', m_id, self.get_revision().revision_number)
+        return redirect('reviewer:show_review', m_id, self.get_revision().revision_number)
 
     def forbid_action(self, action):
         msg = "Action '{}' is not allowed.".format(action)

@@ -1,0 +1,9 @@
+{% extends "editor/manuscript_revision.html" %}
+
+{% block manuscript_divider %}
+  {% with current_tab="text" %}
+    {% include "editor/partials/revision_tabs.html" %}
+  {% endwith %}
+{% endblock %}
+
+

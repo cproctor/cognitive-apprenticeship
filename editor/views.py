@@ -6,6 +6,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.conf import settings
 from author.models import Manuscript, Revision
+from author.mixins import ManuscriptRevisionMixin
 from reviewer.models import Review
 from editor.forms import AssignReviewerForm
 from datetime import datetime, timedelta
@@ -28,7 +29,7 @@ class EditorRoleRequiredMixin:
 class EditorHome(EditorRoleRequiredMixin, TemplateView):
     template_name = "editor/home.html"
 
-class ListEditorManuscripts(EditorRoleRequiredMixin, TemplateView):
+class ListManuscripts(EditorRoleRequiredMixin, TemplateView):
     template_name = "editor/list_manuscripts.html"
 
     def get_context_data(self, **kwargs):
@@ -42,9 +43,23 @@ class ListEditorManuscripts(EditorRoleRequiredMixin, TemplateView):
             c[col.name] = manuscripts
         return c
         
-class ShowEditorManuscript(EditorRoleRequiredMixin, DetailView):
+class ShowManuscript(EditorRoleRequiredMixin, DetailView):
     model = Manuscript
-    template_name = 'editor/show_manuscript.html'
+
+    def get(self, request, *args, **kwargs):
+        m = self.get_object()
+        return redirect('editor:show_revision', m.id, m.revisions.last().revision_number)
+
+class ShowManuscriptReviews(EditorRoleRequiredMixin, DetailView):
+    model = Manuscript
+
+    def get(self, request, *args, **kwargs):
+        m = self.get_object()
+        return redirect('editor:show_revision_reviews', m.id, m.revisions.last().revision_number)
+
+class ShowRevision(EditorRoleRequiredMixin, ManuscriptRevisionMixin, DetailView):
+    model = Revision
+    template_name = 'editor/manuscript_revision_detail.html'
     http_method_names = ['get', 'post']
 
     def __init__(self, *args, **kwargs):
@@ -53,9 +68,20 @@ class ShowEditorManuscript(EditorRoleRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         c = super().get_context_data(**kwargs)
-        c['assign_reviewer_form'] = AssignReviewerForm(self.get_object())
+        revision = self.get_object()
+        m = revision.manuscript
+        missing_authorships = m.authorships.filter(acknowledged=False).all()
+        missing_authors = [authorship.author for authorship in missing_authorships]
+        c['is_waiting_for_authors'] = (len(missing_authors) > 0)
+        if len(missing_authors) > 0:
+            msg = "Waiting on authorship acknowledgement: {}"
+            c['missing_authors_message'] = msg.format(m.format_names(missing_authors))
+
+        # TODO this crashes
+        #c['assign_reviewer_form'] = AssignReviewerForm(self.get_object())
         return c
 
+    # TODO This belongs somewhere else...
     def post(self, request, *args, **kwargs):
         manuscript = self.get_object()
         context = self.get_context_data()
@@ -83,7 +109,11 @@ class ShowEditorManuscript(EditorRoleRequiredMixin, DetailView):
             manuscript.reviewers.remove(user)
             return redirect('editor:show_manuscript', manuscript.id)
 
-class ListEditorReviews(EditorRoleRequiredMixin, TemplateView):
+class ShowRevisionReviews(EditorRoleRequiredMixin, ManuscriptRevisionMixin, DetailView):
+    model = Revision
+    template_name = 'editor/revision_reviews_detail.html'
+
+class ListReviews(EditorRoleRequiredMixin, TemplateView):
     template_name = "editor/list_reviews.html"
 
     def get_context_data(self, **kwargs):

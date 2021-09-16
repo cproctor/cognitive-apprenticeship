@@ -1,0 +1,20 @@
+{% extends "editor/manuscript_revision.html" %}
+
+{% block manuscript_divider %}
+  {% with current_tab="reviews" %}
+    {% include "editor/partials/revision_tabs.html" %}
+  {% endwith %}
+{% endblock %}
+
+{% block manuscript_text %}
+  {% for review in revision.reviews.all %}
+    <hr>
+    <h2>{{review.reviewer.first_name}} {{review.reviewer.last_name}}</h2>
+    {% if review.status == "ASSIGNED" %}
+      <p>Review is due by {{review.date_due}}</p>
+    {% elif review.status == "SUBMITTED" %}
+      <p class="explanation">Status: Submitted</p>
+      {{review.text|safe}}
+    {% endif %}
+  {% endfor %}
+{% endblock %}

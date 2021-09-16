@@ -1,0 +1,46 @@
+{% extends "editor/base.html" %}
+
+{% block content %}
+<div id="manuscript-layout">
+  <div class="manuscript-sidebar">
+  {% block sidebar %}
+    {% with current_revision=revision %}
+      {% for revision in manuscript.revisions.all %}
+        {% include "editor/partials/revision_summary.html" %}
+      {% endfor %}
+    {% endwith %}
+  {% endblock %}
+  </div>
+  <div class="manuscript-content">
+    {% block manuscript_content %}
+    <div class="manuscript-header">
+      {% block manuscript_header %}
+      <h1>{{revision.title}}</h1>
+      <p>by {{manuscript.author_names}}</p>
+      {% if is_waiting_for_authors %}
+        <p>{{missing_authors_message}}</p>
+      {% endif %}
+      <p> {{revision.status}}</p>
+      <div class="manuscript-actions">
+        {% block manuscript_actions %}
+        {% endblock %}
+      </div>
+      {% endblock %}
+    </div>
+    {% block manuscript_divider %}
+    <div class="manuscript-revision-tabs">
+      <div class="tab current">
+        Text
+      </div>
+    </div>
+    {% endblock %}
+    <div class="manuscript-text">
+      {% block manuscript_text %}
+        {{revision.text|safe}}
+      {% endblock %}
+    </div>
+    {% endblock %}
+  </div>
+</div>
+{% endblock %}
+

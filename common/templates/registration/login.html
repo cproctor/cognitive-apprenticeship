@@ -5,7 +5,7 @@
 <form method="post" action="{% url 'login' %}">
   {% csrf_token %}
   {{ form.as_p }}
-  <input type="hidden" name="next" value="{% url 'home_page' %}"</a>
+  <input type="hidden" name="next" value="{% url 'public:home_page' %}"</a>
   <input type="submit" value="Log in">
 </form>
 

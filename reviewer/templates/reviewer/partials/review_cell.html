@@ -1,6 +1,10 @@
 <article class="process-chart-cell review-{{review.status.lower}}">
   <p class="title">
     <a href="{% url 'reviewer:show_manuscript' review.revision.manuscript.id %}">{{review.revision.title}}</a></p>
-	<p>Due {{review.date_due}}</p>
+    {% if review.kanban_column.name == "ASSIGNED" %}
+      <p>Due {{review.date_due}}</p>
+    {% else %}
+      <p>Submitted {{review.date_submitted}}</p>
+    {% endif %}
 	<p class="review-status">{{review.status}}</p>
 </article>

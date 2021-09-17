@@ -5,7 +5,11 @@
     </a>
   </p>
   <p>Review assigned to {{review.reviewer.first_name}} {{review.reviewer.last_name}}</p>
-  <p>Due {{review.date_due}}</p>
+  {% if review.kanban_column.name == "ASSIGNED" %}
+    <p>Due {{review.date_due}}</p>
+  {% else %}
+    <p>Submitted {{review.date_submitted}}</p>
+  {% endif %}
   <p class="review-status">{{review.status}}</p>
 </article>
 

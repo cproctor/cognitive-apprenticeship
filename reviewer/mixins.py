@@ -20,6 +20,7 @@ class ReviewerMixin:
         return super().dispatch(request, *args, **kwargs)
 
     VISIBLE_REVISION_STATUSES = [
+        Revision.StatusChoices.WITHDRAWN,
         Revision.StatusChoices.PENDING,
         Revision.StatusChoices.ACCEPT,
         Revision.StatusChoices.MINOR_REVISION,
@@ -39,9 +40,12 @@ class ReviewerMixin:
 
     def get_context_data(self, *args, **kwargs):
         c = super().get_context_data(*args, **kwargs) 
-        c['visible_revisions'] = self.get_queryset().filter(
-            manuscript_id=self.kwargs['manuscript_pk']
-        )
+        try:
+            c['visible_revisions'] = self.get_queryset().filter(
+                manuscript_id=self.kwargs['manuscript_pk']
+            )
+        except KeyError:
+            pass
         return c
 
 class RevisionReviewMixin:

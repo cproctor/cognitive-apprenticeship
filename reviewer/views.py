@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.http import HttpResponseForbidden
+from django.shortcuts import Http404
 
 from .models import Review
 from .mixins import ReviewerMixin, RevisionReviewMixin
@@ -91,6 +92,8 @@ class EditReview(ReviewerMixin, ManuscriptRevisionMixin, RevisionReviewMixin, Up
     template_name = "reviewer/edit_review.html"
 
     def get_object(self):
+        if self.get_revision().status != Revision.StatusChoices.PENDING:
+            raise Http404()
         return self.get_review()
 
     def get_revision(self):

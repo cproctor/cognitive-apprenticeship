@@ -5,7 +5,7 @@
   <div class="manuscript-sidebar">
   {% block sidebar %}
     {% with current_revision=revision %}
-      {% for revision in manuscript.revisions.all %}
+      {% for revision in visible_revisions %}
         {% include "reviewer/partials/revision_summary.html" %}
       {% endfor %}
     {% endwith %}

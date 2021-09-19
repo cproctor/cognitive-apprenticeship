@@ -19,39 +19,45 @@ class ReviewerMixin:
             return redirect('public:home_page')
         return super().dispatch(request, *args, **kwargs)
 
+    VISIBLE_REVISION_STATUSES = [
+        Revision.StatusChoices.PENDING,
+        Revision.StatusChoices.ACCEPT,
+        Revision.StatusChoices.MINOR_REVISION,
+        Revision.StatusChoices.MAJOR_REVISION,
+        Revision.StatusChoices.REJECT,
+        Revision.StatusChoices.PUBLISHED,
+    ]
+
     def get_queryset(self):
         """Ensures that the revision is part of a Manuscript with the current
         user as reviewer. Assumes that the view's Model is Revision. 
         """
-        return Revision.objects.filter(manuscript__reviewers=self.request.user)
-
-class RevisionReviewMixin:
-    def get_revision(self):
-        "Looks up a revision by manuscript id and revision_number."
-        try:
-            qs = Revision.objects.filter(
-                manuscript__id=self.kwargs['manuscript_pk'],
-                revision_number=self.kwargs['revision_number']
-            )
-            return qs.get()
-        except Revision.DoesNotExist:
-            raise Http404("No such revision")
-
-    def get_review(self):
-        """Returns the review.
-        """
-        revision = self.get_revision()
-        try:
-            return revision.reviews.get(reviewer=self.request.user)
-        except Review.DoesNotExist:
-            return None
+        return Revision.objects.filter(
+            manuscript__reviewers=self.request.user,
+            status__in=self.VISIBLE_REVISION_STATUSES,
+        )
 
     def get_context_data(self, *args, **kwargs):
-        """Populates shared context data.
-        """
+        c = super().get_context_data(*args, **kwargs) 
+        c['visible_revisions'] = self.get_queryset().filter(
+            manuscript_id=self.kwargs['manuscript_pk']
+        )
+        return c
+
+class RevisionReviewMixin:
+    def get_review(self):
+        try:
+            return Review.objects.get(
+                revision__manuscript_id=self.kwargs['manuscript_pk'],
+                revision__revision_number=self.kwargs['revision_number'],
+                reviewer=self.request.user,
+            )
+        except Review.DoesNotExist:
+            raise Http404()
+
+    def get_context_data(self, *args, **kwargs):
         c = super().get_context_data(*args, **kwargs)
         review = self.get_review()
         c['review'] = review
         c['review_deadline'] = review.date_due if review else None
-        #c['show_review_tab'] = review.should_show
         return c

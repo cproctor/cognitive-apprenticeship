@@ -38,7 +38,11 @@
      action="{% url 'author:show_revision' revision.manuscript_id revision.revision_number %}">
     {% csrf_token %}
     {% if revision.can_submit %}
-      <input type="submit" name="action" value="Submit">
+      {% if revision.can_resubmit %}
+        <input type="submit" name="action" value="Resubmit">
+      {% else %}
+        <input type="submit" name="action" value="Submit">
+      {% endif %}
     {% endif %}
     {% if revision.can_withdraw %}
       <input type="submit" name="action" value="Withdraw">

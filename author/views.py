@@ -117,7 +117,7 @@ class ShowRevision(AuthorMixin, ManuscriptRevisionMixin, DetailView):
             manuscript_pk=revision.manuscript_id,
             revision_number=revision.revision_number
         )
-        if action == "SUBMIT":
+        if action == "SUBMIT" or action == "RESUBMIT":
             try:
                 sm.transition(revision, sm.states.PENDING)
                 return redirect_to_revision

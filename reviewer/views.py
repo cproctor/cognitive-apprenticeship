@@ -51,6 +51,8 @@ class ShowReview(ReviewerMixin, ManuscriptRevisionMixin, RevisionReviewMixin, De
 
     def get(self, request, *args, **kwargs):
         review = self.get_review()
+        print(review)
+        print(review.text)
         if not review.text or not review.text.strip():
             m_id = self.get_revision().manuscript_id
             return redirect('reviewer:edit_review', m_id, self.get_revision().revision_number)
@@ -81,7 +83,7 @@ class ReviewInstructions(ReviewerMixin, ManuscriptRevisionMixin, RevisionReviewM
     """Implements the review instructions tab."""
     template_name = "reviewer/review_instructions.html"
 
-class EditReview(ReviewerMixin, RevisionReviewMixin, UpdateView):
+class EditReview(ReviewerMixin, ManuscriptRevisionMixin, RevisionReviewMixin, UpdateView):
     """Implements the review-authoring tab for a revision.
     """
     model = Review
@@ -89,12 +91,18 @@ class EditReview(ReviewerMixin, RevisionReviewMixin, UpdateView):
     template_name = "reviewer/edit_review.html"
 
     def get_object(self):
-        return self.get_revision().reviews.get(reviewer=self.request.user)
+        return self.get_review()
 
-    def get_context_data(self, *args, **kwargs):
-        "Populates `manuscript` and `revision` in template context."
-        ctx = super().get_context_data(*args, **kwargs)
+    def get_revision(self):
+        try:
+            return self.get_queryset().get(
+                manuscript__id=self.kwargs['manuscript_pk'],
+                revision_number=self.kwargs['revision_number']
+            )
+        except Revision.DoesNotExist:
+            raise Http404("No such revision")
+
+    def get_success_url(self):
         revision = self.get_revision()
-        ctx['revision'] = revision
-        ctx['manuscript'] = revision.manuscript
-        return ctx
+        return reverse('reviewer:show_review', args=(revision.manuscript_id, revision.revision_number))
+

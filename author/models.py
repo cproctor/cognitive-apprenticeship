@@ -186,6 +186,12 @@ class Revision(models.Model):
         later_revisions = self.manuscript.revisions.filter(revision_number__gt=self.revision_number)
         return self.status in valid_statuses and not later_revisions.exists()
 
+    def can_resubmit(self):
+        return self.can_submit() and self.manuscript.revisions.filter(
+            revision_number__lt=self.revision_number,
+            status__in=[self.StatusChoices.MINOR_REVISION, self.StatusChoices.MAJOR_REVISION],
+        ).exists()
+
     def can_edit(self):
         valid_statuses = [
             self.StatusChoices.UNSUBMITTED,

@@ -33,11 +33,10 @@ class ManuscriptRevisionMixin:
         "Looks up a revision by manuscript id and revision_number."
         qs = queryset or self.get_queryset()
         try:
-            qs = Revision.objects.filter(
+            return qs.get(
                 manuscript__id=self.kwargs['manuscript_pk'],
                 revision_number=self.kwargs['revision_number']
             )
-            return qs.get()
         except Revision.DoesNotExist:
             raise Http404("No such revision")
 
@@ -50,7 +49,7 @@ class ManuscriptRevisionMixin:
     def get_context_data(self, *args, **kwargs):
         "Populates `manuscript` and `revision` in template context."
         ctx = super().get_context_data(*args, **kwargs)
-        revision = self.get_object()
+        revision = self.get_revision()
         ctx['revision'] = revision
         ctx['manuscript'] = revision.manuscript
         return ctx

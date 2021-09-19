@@ -34,13 +34,16 @@ class RevisionStateMachine(StateMachine):
             
     def unsubmitted_to_pending(self, rev, old_state, new_state):
         self.log_state_transition(rev, old_state, new_state)
-        msg = '"{}" has been submitted. You will be notified once reviewers provide feedback.'
+        if rev.can_resubmit():
+            msg = '"{}" has been resubmitted. You will be notified once reviewers provide new feedback.'
+        else:
+            msg = '"{}" has been submitted. You will be notified once reviewers provide feedback.'
         self.flash_authors(rev, msg.format(rev.title))
         rev.status = new_state
         rev.date_submitted = timezone.now()
         rev.save()
         notify_user_revision_transitioned_from_unsubmitted_to_pending(rev)
-        if settings.AUTOMATICALLY_ASSIGN_REVIEWERS:
+        if settings.AUTOMATICALLY_ASSIGN_REVIEWERS and not rev.can_resubmit():
             reviewers = ranked_reviewers(rev.manuscript.authors.all())
             if len(reviewers) >= settings.NUMBER_OF_REVIEWERS:
                 rev.manuscript.reviewers.add(*reviewers[:settings.NUMBER_OF_REVIEWERS])

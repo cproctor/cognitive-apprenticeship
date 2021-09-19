@@ -24,11 +24,7 @@
       {% endblock %}
     </div>
     {% block manuscript_divider %}
-    <div class="manuscript-revision-tabs">
-      <div class="tab current">
-        Text
-      </div>
-    </div>
+      {% include "author/partials/revision_tabs.html" %}
     {% endblock %}
     <div class="manuscript-text">
       {% block manuscript_text %}

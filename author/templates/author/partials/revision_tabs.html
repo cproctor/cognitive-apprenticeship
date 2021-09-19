@@ -1,0 +1,25 @@
+<div class="manuscript-revision-tabs">
+  {% if current_tab == "text" %}
+    <div class="tab current">
+      Text
+    </div>
+  {% else %}
+    <div class="tab">
+      <a href="{% url 'author:show_revision' revision.manuscript_id revision.revision_number %}">Text</a>
+    </div>
+  {% endif %}
+  {% if revision.should_show_reviews_to_author %}
+    {% if current_tab == "reviews" %}
+      <div class="tab current">
+        Reviews
+      </div>
+    {% else %}
+      <div class="tab">
+        <a href="{% url 'author:show_revision_reviews' revision.manuscript_id revision.revision_number %}">
+          Reviews
+        </a>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>
+

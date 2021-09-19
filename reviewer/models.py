@@ -43,15 +43,18 @@ class Review(models.Model):
             self.status
         )
 
+    # TODO Delete?
     def is_expired(self):
         return self.status == self.StatusChoices.EXPIRED
 
+    # TODO Delete?
     def is_assigned(self):
         return self.status in [
             self.StatusChoices.ASSIGNED,
             self.StatusChoices.EDIT_REQUESTED,
         ]
 
+    # TODO Delete?
     def is_submitted(self):
         return self.status == self.StatusChoices.SUBMITTED
 

@@ -1,0 +1,19 @@
+{% extends "author/manuscript_revision_detail.html" %}
+
+{% block manuscript_divider %}
+  {% with current_tab="reviews" %}
+    {% include "author/partials/revision_tabs.html" %}
+  {% endwith %}
+{% endblock %}
+
+{% block manuscript_text %}
+  <h2>Editorial review</h2>
+  {{revision.editorial_review|safe}}
+  {% for review in revision.reviews.all %}
+    {% if review.status == "COMPLETE" %}
+      <h2>Reviewer {{forloop.counter}}</h2>
+      <p class="explanation">Recommendation: {{review.recommendation}}</p>
+      {{review.text|safe}}
+    {% endif %}
+  {% endfor %}
+{% endblock %}

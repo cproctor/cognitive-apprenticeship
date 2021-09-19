@@ -193,6 +193,12 @@ class Revision(models.Model):
         ]
         return self.status in valid_statuses
 
+    def should_show_reviews_to_author(self):
+        return self.kanban_column() in [
+            self.KanbanColumns.DECIDED,
+            self.KanbanColumns.PUBLISHED
+        ]
+
     class KanbanColumns(Enum):
         IN_PREPARATION = auto()
         IN_SUBMISSION = auto()
@@ -212,7 +218,7 @@ class Revision(models.Model):
     }
 
     def kanban_column(self):
-        return self.KANBAN_ASSIGNMENT[self.revisions.last().status]
+        return self.KANBAN_ASSIGNMENT[self.status]
 
     @classmethod
     def in_kanban_columns(self, revisions):

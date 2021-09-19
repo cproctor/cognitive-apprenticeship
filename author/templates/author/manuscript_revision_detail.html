@@ -50,3 +50,8 @@
 </div>
 {% endblock %}
 
+{% block manuscript_divider %}
+  {% with current_tab="text" %}
+    {% include "author/partials/revision_tabs.html" %}
+  {% endwith %}
+{% endblock %}

@@ -184,6 +184,9 @@ class ShowRevision(AuthorMixin, ManuscriptRevisionMixin, DetailView):
             revision_number=new_revision.revision_number
         )
 
+class ShowRevisionReviews(ShowRevision):
+    template_name = "author/revision_reviews_detail.html"
+
 class EditRevision(AuthorMixin, ManuscriptRevisionMixin, UpdateView):
     model = Revision
     form_class = EditRevisionForm

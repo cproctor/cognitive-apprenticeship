@@ -1,6 +1,6 @@
 <article class="revision {% if current_revision == revision %}current{% endif %}">
 	<h3>
-		{% if current_revision == revision or revision.is_withdrawn %}
+		{% if current_revision == revision %}
 		  {{revision.title}} (Revision {{revision.revision_number}})
 		{% else %}
 		<a href="{% url 'reviewer:show_revision' revision.manuscript_id revision.revision_number %}">

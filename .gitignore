@@ -1,4 +1,5 @@
 *.pyc
 *.sqlite3
 *.swp
+*.swo
 *.log

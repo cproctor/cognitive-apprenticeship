@@ -76,7 +76,7 @@ class Review(models.Model):
     KANBAN_ASSIGNMENT = {
         StatusChoices.ASSIGNED:         KanbanColumns.ASSIGNED,
         StatusChoices.EDIT_REQUESTED:   KanbanColumns.ASSIGNED,
-        StatusChoices.WITHDRAWN:        KanbanColumns.ASSIGNED,
+        StatusChoices.WITHDRAWN:        KanbanColumns.COMPLETE,
         StatusChoices.EXPIRED:          KanbanColumns.ASSIGNED,
         StatusChoices.SUBMITTED:        KanbanColumns.SUBMITTED,
         StatusChoices.NOT_NEEDED:       KanbanColumns.COMPLETE,

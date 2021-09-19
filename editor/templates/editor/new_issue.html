@@ -1,5 +1,9 @@
 {% extends "editor/base.html" %}
 
+{% block head %}
+  {{ form.media }}
+{% endblock %}
+
 {% block content %}
 <h1>Create a new issue</h1>
 <form method="post" action="{% url 'editor:new_issue' %}">

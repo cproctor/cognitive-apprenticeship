@@ -25,6 +25,8 @@ class AssignReviewerForm(forms.Form):
 
 class NewJournalIssueForm(forms.ModelForm):
     
+    introduction = forms.CharField(widget=TinyMCE()) 
+
     class Meta:
         model = JournalIssue
         fields = ['title', 'introduction', 'volume', 'number']
@@ -39,6 +41,7 @@ class EditJournalIssueForm(forms.ModelForm):
             Revision.StatusChoices.PUBLISHED,
         ]),
         widget=forms.CheckboxSelectMultiple,
+        required=False,
     )
 
     class Meta:

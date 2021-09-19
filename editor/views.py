@@ -196,6 +196,9 @@ class EditIssue(EditorRoleRequiredMixin, UpdateView):
     template_name = "editor/edit_issue.html"
     context_object_name = "issue"
     
+    def get_success_url(self):
+        return reverse('editor:show_issue', args=(self.object.id,))
+
 
 
 

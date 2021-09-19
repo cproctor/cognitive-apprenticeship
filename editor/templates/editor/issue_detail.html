@@ -1,8 +1,21 @@
 {% extends "editor/base.html" %}
 
 {% block content %}
-<h1>{{issue.title}}</h1>
-<p><a href="{% url 'editor:edit_issue' issue.id %}">Edit</a></p>
-<p>Volume {{issue.volume}}, number {{issue.number}}</p>
-<p>{{issue.introduction}}</p>
+  <h1>{{issue.title}}</h1>
+  <p><a href="{% url 'editor:edit_issue' issue.id %}">Edit</a></p>
+  {% if issue.published %}
+   <p>Published</p>
+  {% else %}
+   <p>Not published</p>
+  {% endif %}
+  <p>Volume {{issue.volume}}, number {{issue.number}}</p>
+  <p>{{issue.introduction|safe}}</p>
+  {% if issue.manuscripts.count %}
+    <h2>Contents</h2>
+    <ul>
+      {% for m in issue.manuscripts.all %}
+        <li>{{m}}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 {% endblock %}

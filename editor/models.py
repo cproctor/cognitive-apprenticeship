@@ -7,4 +7,4 @@ class JournalIssue(models.Model):
     introduction = models.TextField()
     date_published = models.DateTimeField(blank=True, null=True)
     manuscripts = models.ManyToManyField('author.Manuscript', related_name='issues', blank=True)
-    published = models.BooleanField(default=False)
+    published = models.BooleanField(default=False, blank=True)

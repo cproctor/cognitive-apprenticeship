@@ -1,17 +1,9 @@
 {% extends "reviewer/manuscript_revision.html" %}
 
 {% block manuscript_divider %}
-<div class="manuscript-revision-tabs">
-  <div class="tab">
-    <a href="{% url 'reviewer:show_revision' manuscript.pk revision.revision_number %}">Text</a>
-  </div>
-  <div class="tab">
-    <a href="{% url 'reviewer:show_review' manuscript.pk revision.revision_number %}">Review</a>
-  </div>
-  <div class="tab current">
-    Instructions
-  </div>
-</div>
+  {% with current_tab="instructions" %}
+    {% include "reviewer/partials/revision_tabs.html" %}
+  {% endwith %}
 {% endblock %}
 
 {% block manuscript_text %}

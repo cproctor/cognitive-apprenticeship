@@ -1,0 +1,29 @@
+<div class="manuscript-revision-tabs">
+  {% if current_tab == "text" %}
+    <div class="tab current">
+      Text
+    </div>
+  {% else %}
+    <div class="tab">
+      <a href="{% url 'reviewer:show_revision' manuscript.pk revision.revision_number %}">Text</a>
+    </div>
+  {% endif %}
+  {% if current_tab == "review" %}
+    <div class="tab current">
+      Review
+    </div>
+  {% else %}
+    <div class="tab">
+      <a href="{% url 'reviewer:show_review' manuscript.pk revision.revision_number %}">Review</a>
+    </div>
+  {% endif %}
+  {% if current_tab == "instructions" %}
+    <div class="tab current">
+      Instructions
+    </div>
+  {% else %}
+    <div class="tab">
+      <a href="{% url 'reviewer:review_instructions' manuscript.pk revision.revision_number %}">Instructions</a>
+    </div>
+  {% endif %}
+</div>

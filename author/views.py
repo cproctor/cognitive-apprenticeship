@@ -9,7 +9,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.contrib import messages
 from .models import Manuscript, ManuscriptAuthorship, Revision
-from .forms import NewManuscriptForm, EditRevisionForm
+from .forms import NewManuscriptForm, EditRevisionForm, EditResubmittedRevisionForm
 from .state_machine import RevisionStateMachine
 from .mixins import (
     AuthorMixin,
@@ -189,8 +189,13 @@ class ShowRevisionReviews(ShowRevision):
 
 class EditRevision(AuthorMixin, ManuscriptRevisionMixin, UpdateView):
     model = Revision
-    form_class = EditRevisionForm
     template_name = "author/edit_revision.html"
+
+    def get_form_class(self):
+        if self.get_object().has_prior_decision():
+            return EditResubmittedRevisionForm
+        else:
+            return EditRevisionForm
 
     def get_success_url(self):
         revision = self.get_object()

@@ -163,7 +163,9 @@ class Revision(models.Model):
         )
 
     def can_submit(self):
-        return self.status == self.StatusChoices.UNSUBMITTED
+        is_unsubmitted = (self.status == self.StatusChoices.UNSUBMITTED)
+        has_revision_note_if_needed = self.revision_note or not self.has_prior_decision()
+        return is_unsubmitted and has_revision_note_if_needed
 
     def has_reviews_underway(self):
         review_underway_states = ['SUBMITTED', 'COMPLETE', 'EDIT_REQUESTED']

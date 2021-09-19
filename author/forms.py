@@ -28,3 +28,15 @@ class EditRevisionForm(forms.ModelForm):
     class Meta:
         model = Revision
         fields = ['title', 'text']
+
+class EditResubmittedRevisionForm(forms.ModelForm):
+    title = forms.CharField(max_length=200)
+    text = forms.CharField(widget=TinyMCE())
+    revision_note = forms.CharField(widget=TinyMCE())
+
+    class Meta:
+        model = Revision
+        fields = ['title', 'text', 'revision_note']
+
+
+

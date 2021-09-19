@@ -16,7 +16,15 @@
     <button type="button">Cancel</button>
   </a>
   <hr>
+  {{form.text.errors}}
   {{form.text}}
+  <h3>Revision note</h3>
+  <p>
+    Because this is a resubmission, you must include a short note to your
+    reviewers explaining what you have changed.
+  </p>
+  {{form.revision_note.errors}}
+  {{form.revision_note}}
 </form>
 {% endblock %}
 

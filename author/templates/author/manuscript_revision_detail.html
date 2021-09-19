@@ -59,3 +59,13 @@
     {% include "author/partials/revision_tabs.html" %}
   {% endwith %}
 {% endblock %}
+
+{% block manuscript_text %}
+  {% if revision.revision_note %}
+    <h2>Revision note</h2>
+    {{revision.revision_note|safe}}
+    <hr>
+    <h2>Manuscript</h2>
+  {% endif %}
+  {{revision.text|safe}}
+{% endblock %}

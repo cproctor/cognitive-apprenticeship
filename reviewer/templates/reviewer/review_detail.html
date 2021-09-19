@@ -12,12 +12,72 @@
       <button>Edit review</button>
     </a>
   {% endif %}
-  {% if review.can_submit %}
+  {% if review.can_submit and review.recommendation %}
     <form method="post" action="{% url 'reviewer:show_review' manuscript.pk revision.revision_number %}">
       {% csrf_token %}
       <input type="submit" name="action" value="Submit">
     </form>
   {% endif %}
-  {{review.text|safe}}
-  <p class="decision">Recommendation: {{review.recommendation}}</p>
+  {% if review.status == "ASSIGNED" %}
+    {{review.text|safe}}
+    <p class="decision">Recommendation: {{review.recommendation}}</p>
+  {% elif review.status == "SUBMITTED" %}
+      {{review.text|safe}}
+      <p class="decision">Recommendation: {{review.recommendation}}</p>
+  {% elif review.status == "COMPLETE" %}
+    <h2>Editorial review</h2>
+    {{revision.editorial_review|safe}}
+    <p class="explanation">Decision: {{revision.status}}</p>
+    <hr>
+    <h2>Your review</h2>
+    {{review.text|safe}}
+    <p class="explanation">Recommendation: {{review.recommendation}}</p>
+    {% for r in revision.reviews.all %}
+      {% if r.status == "COMPLETE" and r.reviewer != request.user %}
+        <h2>Other reviewer</h2>
+        {{r.text|safe}}
+        <p class="explanation">Recommendation: {{r.recommendation}}</p>
+      {% endif %}
+    {% endfor %}
+  {% elif review.status == "EXPIRED" %}
+    <h2>Editorial review</h2>
+    {{revision.editorial_review|safe}}
+    <p class="explanation">Decision: {{revision.status}}</p>
+    <hr>
+    <p class="explanation">
+      The deadline passed for your review so the author made a decision on this manuscript.
+    </p>
+    {% if review.text %}
+      {{review.text|safe}}
+      <p class="decision">Recommendation: {{review.recommendation}}</p>
+    {% endif %}
+  {% elif review.status == "WITHDRAWN" %}
+    {% if review.text %}
+      <p class="explanation">The author withdrew their manuscript. Here is the review you wrote:</p>
+      {{review.text|safe}}
+      <p class="decision">Recommendation: {{review.recommendation}}</p>
+    {% endif %}
+  {% elif review.status == "NOT_NEEDED" %}
+    <h2>Editorial review</h2>
+    {{revision.editorial_review|safe}}
+    <p class="explanation">Decision: {{revision.status}}</p>
+    <hr>
+    <p class="explanation">
+      The author made a decision on this manuscript before your review was due.
+    </p>
+    {% if review.text %}
+      {{review.text|safe}}
+      <p class="decision">Recommendation: {{review.recommendation}}</p>
+    {% endif %}
+  {% elif review.status == "EDIT_REQUESTED" %}
+    <p class="explanation">
+      The editor has requested that you edit your review.
+    </p>
+    {{review.editor_feedback|safe}}
+    <hr>
+    {% if review.text %}
+      {{review.text|safe}}
+      <p class="decision">Recommendation: {{review.recommendation}}</p>
+    {% endif %}
+  {% endif %}
 {% endblock %}

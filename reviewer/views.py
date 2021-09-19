@@ -52,9 +52,7 @@ class ShowReview(ReviewerMixin, ManuscriptRevisionMixin, RevisionReviewMixin, De
 
     def get(self, request, *args, **kwargs):
         review = self.get_review()
-        print(review)
-        print(review.text)
-        if not review.text or not review.text.strip():
+        if review.revision.status == Revision.StatusChoices.PENDING and not review.text:
             m_id = self.get_revision().manuscript_id
             return redirect('reviewer:edit_review', m_id, self.get_revision().revision_number)
         else:

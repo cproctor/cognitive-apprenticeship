@@ -1,7 +1,7 @@
 from django.db import models
 
 class JournalIssue(models.Model):
-    title = models.TextField()
+    title = models.CharField(max_length=200)
     volume = models.IntegerField()
     number = models.IntegerField()
     introduction = models.TextField()

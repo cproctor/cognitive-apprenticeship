@@ -30,6 +30,8 @@ class NewJournalIssueForm(forms.ModelForm):
         fields = ['title', 'introduction', 'volume', 'number']
 
 class EditJournalIssueForm(forms.ModelForm):
+
+    introduction = forms.CharField(widget=TinyMCE()) 
     
     manuscripts = forms.ModelMultipleChoiceField(
         queryset=Manuscript.objects.filter(revisions__status__in=[

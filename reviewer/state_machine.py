@@ -1,6 +1,7 @@
 from common.state_machine import StateMachine
 from django.contrib import messages
 from django.conf import settings
+from django.utils import timezone
 from datetime import datetime, timedelta
 import logging
 from .models import Review
@@ -20,7 +21,7 @@ class ReviewStateMachine(StateMachine):
         msg = "Your review was submitted. Awaiting an editor decision."
         self.flash_authors(rev, msg, level=messages.SUCCESS)
         rev.status = new_state
-        rev.date_submitted = datetime.now()
+        rev.date_submitted = timezone.now()
         rev.save()
 
     def assigned_to_expired(self, rev, old_state, new_state):
@@ -28,6 +29,7 @@ class ReviewStateMachine(StateMachine):
         msg = "Your assigned review expired. You may contact the editor to request an extension."
         self.flash_authors(rev, msg, level=messages.WARNING)
         rev.status = new_state
+        rev.date_closed = timezone.now()
         rev.save()
 
     def assigned_to_withdrawn(self, rev, old_state, new_state):
@@ -35,6 +37,16 @@ class ReviewStateMachine(StateMachine):
         msg = "The manuscript you were assigned to review was withdrawn by its author."
         self.flash_authors(rev, msg)
         rev.status = new_state
+        rev.date_closed = timezone.now()
+        rev.save()
+
+    def assigned_to_not_needed(self, rev, old_state, new_state):
+        print("  > executing assigned_to_not_needed")
+        self.log_state_transition(rev, old_state, new_state)
+        msg = "The editor made a decision on this manuscript before your review was submitted"
+        self.flash_authors(rev, msg)
+        rev.status = new_state
+        rev.date_closed = timezone.now()
         rev.save()
 
     def submitted_to_complete(self, rev, old_state, new_state):
@@ -49,7 +61,7 @@ class ReviewStateMachine(StateMachine):
         msg = "The editor requested that you edit your review."
         self.flash_authors(rev, msg.format(rev.title))
         rev.status = new_state
-        rev.date_due = datetime.now + timedelta(days=settings.DAYS_TO_EDIT_REVIEW)
+        rev.date_due = timezone.now() + timedelta(days=settings.DAYS_TO_EDIT_REVIEW)
         rev.save()
 
     def expired_to_assigned(self, rev, old_state, new_state):
@@ -57,7 +69,8 @@ class ReviewStateMachine(StateMachine):
         msg = "The editor extended the deadline for an expired review."
         self.flash_authors(rev, msg)
         rev.status = new_state
-        rev.date_due = datetime.now + timedelta(days=settings.DAYS_ON_EXTENSION) 
+        rev.date_due = timezone.now() + timedelta(days=settings.DAYS_ON_EXTENSION) 
+        rev.date_complete = None
         rev.save()
 
     def edit_requested_to_submitted(self, rev, old_state, new_state):
@@ -65,7 +78,7 @@ class ReviewStateMachine(StateMachine):
         msg = "You resubmitted your review."
         self.flash_authors(rev, msg, level=messages.SUCCESS)
         rev.status = new_state
-        rev.date_submitted = datetime.now()
+        rev.date_submitted = timezone.now()
         rev.save()
 
     def edit_requested_to_expired(self, rev, old_state, new_state):
@@ -95,6 +108,7 @@ class ReviewStateMachine(StateMachine):
         states.ASSIGNED: {
             states.SUBMITTED: assigned_to_submitted,
             states.EXPIRED: assigned_to_expired,
+            states.NOT_NEEDED: assigned_to_not_needed,
             states.WITHDRAWN: assigned_to_withdrawn,
         },
         states.SUBMITTED: {

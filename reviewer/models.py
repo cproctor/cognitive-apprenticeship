@@ -14,6 +14,7 @@ class Review(models.Model):
         COMPLETE = 'COMPLETE', 'Complete'
         EXPIRED = 'EXPIRED', 'Expired'
         WITHDRAWN = 'WITHDRAWN', 'Manuscript was withdrawn'
+        NOT_NEEDED = 'NOT_NEEDED', "A decision was reached before this review was submitted"
         EDIT_REQUESTED = 'EDIT_REQUESTED', 'Editing of review requested'
     class RecommendationChoices(models.TextChoices):
         ACCEPT = 'ACCEPT', 'Accept'
@@ -27,8 +28,9 @@ class Review(models.Model):
     status = models.CharField(max_length=20, choices=StatusChoices.choices, default=StatusChoices.ASSIGNED)
     recommendation = models.CharField(max_length=20,
             choices=RecommendationChoices.choices, blank=True, null=True)
-    date_due = models.DateTimeField()
+    date_due = models.DateTimeField(blank=True, null=True)
     date_submitted = models.DateTimeField(blank=True, null=True)
+    date_closed = models.DateTimeField(blank=True, null=True)
     editor_feedback = models.TextField(blank=True, null=True)
 
     objects = ReviewManager()
@@ -74,6 +76,7 @@ class Review(models.Model):
         StatusChoices.WITHDRAWN:        KanbanColumns.ASSIGNED,
         StatusChoices.EXPIRED:          KanbanColumns.ASSIGNED,
         StatusChoices.SUBMITTED:        KanbanColumns.SUBMITTED,
+        StatusChoices.NOT_NEEDED:       KanbanColumns.COMPLETE,
         StatusChoices.COMPLETE:         KanbanColumns.COMPLETE,
     }
 

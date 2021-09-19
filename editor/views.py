@@ -2,13 +2,20 @@ from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, UpdateView, FormView
+from django.contrib import messages
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.conf import settings
 from author.models import Manuscript, Revision
 from author.mixins import ManuscriptRevisionMixin
+from author.state_machine import RevisionStateMachine
 from reviewer.models import Review
-from editor.forms import AssignReviewerForm
+from reviewer.forms import EditReviewForm
+from editor.forms import (
+    AssignReviewerForm, 
+    EditorialReviewForm,
+    EditorialDecisionForm
+)
 from datetime import datetime, timedelta
 from .models import JournalIssue
 from .forms import NewJournalIssueForm, EditJournalIssueForm
@@ -27,7 +34,8 @@ class EditorRoleRequiredMixin:
         return super().dispatch(request, *args, **kwargs)
 
 class EditorHome(EditorRoleRequiredMixin, TemplateView):
-    template_name = "editor/home.html"
+    def get(self, request, *args, **kwargs):
+        return redirect('editor:list_manuscripts')
 
 class ListManuscripts(EditorRoleRequiredMixin, TemplateView):
     template_name = "editor/list_manuscripts.html"
@@ -76,9 +84,6 @@ class ShowRevision(EditorRoleRequiredMixin, ManuscriptRevisionMixin, DetailView)
         if len(missing_authors) > 0:
             msg = "Waiting on authorship acknowledgement: {}"
             c['missing_authors_message'] = msg.format(m.format_names(missing_authors))
-
-        # TODO this crashes
-        #c['assign_reviewer_form'] = AssignReviewerForm(self.get_object())
         return c
 
     # TODO This belongs somewhere else...
@@ -112,6 +117,48 @@ class ShowRevision(EditorRoleRequiredMixin, ManuscriptRevisionMixin, DetailView)
 class ShowRevisionReviews(EditorRoleRequiredMixin, ManuscriptRevisionMixin, DetailView):
     model = Revision
     template_name = 'editor/revision_reviews_detail.html'
+
+    def get_context_data(self, **kwargs):
+        c = super().get_context_data(**kwargs)
+        c['decision_form'] = EditorialDecisionForm()
+        return c
+
+    def post(self, request, *args, **kwargs):
+        "Handles the editorial decision form"
+        action = request.POST['action'].upper()
+        revision = self.get_revision()
+        if action.upper() == "ISSUE DECISION":
+            if revision.status != Revision.StatusChoices.PENDING:
+                return self.invalid_post("Only pending revisions can have decisions applied.")
+            sm = RevisionStateMachine(request)
+            decision = request.POST['recommendation'].upper()
+            if decision == "ACCEPT": 
+                sm.transition(revision, sm.states.ACCEPT)
+            elif decision == "MINOR":
+                sm.transition(revision, sm.states.MINOR_REVISION)
+            elif decision == "MAJOR":
+                sm.transition(revision, sm.states.MAJOR_REVISION)
+            elif decision == "REJECT":
+                sm.transition(revision, sm.states.REJECT)
+            else:
+                return self.invalid_post("Invalid decision '{}'".format(request.POST['recommendation']))
+            return redirect('editor:show_revision_reviews', revision.manuscript_id, revision.revision_number)
+        else:
+            return self.invalid_post("Invalid action '{}'".format(action))
+
+    def invalid_post(self, message):
+        revision = self.get_revision()
+        messages.add_message(self.request, messages.WARNING, message)
+        return redirect('editor:show_revision_reviews', revision.manuscript_id, revision.revision_number)
+
+class EditRevisionEditorialReview(EditorRoleRequiredMixin, ManuscriptRevisionMixin, UpdateView):
+    model = Revision
+    template_name = 'editor/edit_revision_editorial_review.html'
+    form_class = EditorialReviewForm
+
+    def get_success_url(self):
+        r = self.get_object()
+        return reverse('editor:show_revision_reviews', args=(r.manuscript_id, r.revision_number))
 
 class ListReviews(EditorRoleRequiredMixin, TemplateView):
     template_name = "editor/list_reviews.html"

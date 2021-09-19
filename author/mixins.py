@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.shortcuts import redirect
+from django.http import Http404
 from .models import Revision
 
 class AuthorMixin:
@@ -39,6 +40,12 @@ class ManuscriptRevisionMixin:
             return qs.get()
         except Revision.DoesNotExist:
             raise Http404("No such revision")
+
+    def get_revision(self):
+        return self.get_object()
+
+    def get_manuscript(self):
+        return self.get_revision().manuscript
 
     def get_context_data(self, *args, **kwargs):
         "Populates `manuscript` and `revision` in template context."

@@ -7,13 +7,37 @@
 {% endblock %}
 
 {% block manuscript_text %}
+  {% block editorial_review %}
+    <h2>Editorial review</h2>
+    {% if revision.status == "PENDING" %}
+      {% if revision.editorial_review %}
+        {{revision.editorial_review|safe}}
+        <a href="{% url 'editor:edit_revision_editorial_review' manuscript.id revision.revision_number %}">
+          <button>Edit editorial review</button>
+        </a>
+        <form method="post" action="{% url 'editor:show_revision_reviews' manuscript.id revision.revision_number %}">
+          {% csrf_token %}
+          {{ decision_form }}
+          <input type="submit" name="action" value="Issue decision">
+        </form>
+      {% else %}
+        <p class="explanation">You need to add an editorial review before issuing a decision.</p>
+        <a href="{% url 'editor:edit_revision_editorial_review' manuscript.id revision.revision_number %}">
+          <button>Add editorial review</button>
+        </a>
+      {% endif %}
+    {% else %}
+      {{ revision.editorial_review|safe }}
+    {% endif %}
+  {% endblock %}
   {% for review in revision.reviews.all %}
     <hr>
     <h2>{{review.reviewer.first_name}} {{review.reviewer.last_name}}</h2>
     {% if review.status == "ASSIGNED" %}
-      <p>Review is due by {{review.date_due}}</p>
+      <p class="explanation">Review is due by {{review.date_due}}</p>
     {% elif review.status == "SUBMITTED" %}
       <p class="explanation">Status: Submitted</p>
+      <p class="explanation">Recommendation: {{review.recommendation}}</p>
       {{review.text|safe}}
     {% endif %}
   {% endfor %}

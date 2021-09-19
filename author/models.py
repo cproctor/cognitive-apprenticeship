@@ -2,6 +2,7 @@ from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils import timezone
 from tinymce.models import HTMLField
 from common.models import NondeletedManager
 from django.db.models import Q, Count
@@ -94,8 +95,9 @@ class Revision(models.Model):
             related_name="revisions")
     title = models.CharField(max_length=200)
     revision_number = models.IntegerField()
-    revision_note = models.TextField(blank=True, null=True)
+    revision_note = HTMLField(blank=True, null=True)
     text = HTMLField()
+    editorial_review = HTMLField(blank=True, null=True)
     date_created = models.DateTimeField()
     date_submitted = models.DateTimeField(blank=True, null=True)
     date_decided = models.DateTimeField(blank=True, null=True)
@@ -124,12 +126,21 @@ class Revision(models.Model):
         elif self.status == self.StatusChoices.PENDING:
             verb = "submitted"
             ts = self.date_submitted
+        elif self.status == self.StatusChoices.ACCEPT:
+            verb = "accepted"
+            ts = self.date_decided
+        elif self.status == self.StatusChoices.MINOR_REVISION:
+            verb = "minor revisions requested"
+            ts = self.date_decided
+        elif self.status == self.StatusChoices.MAJOR_REVISION:
+            verb = "major revisions requested"
+            ts = self.date_decided
+        elif self.status == self.StatusChoices.REJECT:
+            verb = "rejected"
+            ts = self.date_decided
         elif self.status == self.StatusChoices.PUBLISHED:
             verb = "published"
             ts = self.date_published
-        else:
-            verb = "decision received"
-            ts = self.date_decided
         return "{} {}".format(verb.capitalize(), ts.strftime(self.timeformat))
 
     def status_message_for_reviewers(self):
@@ -147,7 +158,7 @@ class Revision(models.Model):
             title=self.title,
             text=self.text,
             revision_number=self.revision_number + 1,
-            date_created=datetime.now(),
+            date_created=timezone.now(),
             status=status,
         )
 
@@ -193,10 +204,10 @@ class Revision(models.Model):
         StatusChoices.WAITING_FOR_AUTHORS:  KanbanColumns.IN_PREPARATION,
         StatusChoices.WITHDRAWN:            KanbanColumns.IN_PREPARATION,
         StatusChoices.PENDING:              KanbanColumns.IN_SUBMISSION,
+        StatusChoices.ACCEPT:               KanbanColumns.DECIDED,
         StatusChoices.MINOR_REVISION:       KanbanColumns.DECIDED,
         StatusChoices.MAJOR_REVISION:       KanbanColumns.DECIDED,
         StatusChoices.REJECT:               KanbanColumns.DECIDED,
-        StatusChoices.ACCEPT:               KanbanColumns.PUBLISHED,
         StatusChoices.PUBLISHED:            KanbanColumns.PUBLISHED,
     }
 

@@ -12,6 +12,8 @@ urlpatterns = [
             views.ShowRevision.as_view(), name='show_revision'),
     path('manuscripts/<int:manuscript_pk>/versions/<int:revision_number>/reviews', 
             views.ShowRevisionReviews.as_view(), name='show_revision_reviews'),
+    path('manuscripts/<int:manuscript_pk>/versions/<int:revision_number>/reviews/editorial', 
+            views.EditRevisionEditorialReview.as_view(), name='edit_revision_editorial_review'),
     path('reviews', views.ListReviews.as_view(), name='list_reviews'),
     path('issues', views.ListIssues.as_view(), name='list_issues'),
     path('issues/new', views.NewIssue.as_view(), name='new_issue'),

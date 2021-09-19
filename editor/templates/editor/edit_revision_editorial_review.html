@@ -1,0 +1,13 @@
+{% extends "editor/revision_reviews_detail.html" %}
+
+{% block head %}
+  {{ form.media }}
+{% endblock %}
+
+{% block editorial_review %}
+<form method="post" action="{% url 'editor:edit_revision_editorial_review' manuscript.id revision.revision_number %}">
+  {% csrf_token %}
+  {{ form }}
+  <input type="submit" value="Save">
+</form>
+{% endblock %}

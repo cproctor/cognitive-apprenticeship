@@ -2,6 +2,7 @@ from common.state_machine import StateMachine
 from django.contrib import messages
 from django.conf import settings
 from datetime import datetime, timedelta
+from django.utils import timezone
 import logging
 from .models import Revision
 from reviewer.models import Review
@@ -36,7 +37,7 @@ class RevisionStateMachine(StateMachine):
         msg = '"{}" has been submitted. You will be notified once reviewers provide feedback.'
         self.flash_authors(rev, msg.format(rev.title))
         rev.status = new_state
-        rev.date_submitted = datetime.now()
+        rev.date_submitted = timezone.now()
         rev.save()
         notify_user_revision_transitioned_from_unsubmitted_to_pending(rev)
         if settings.AUTOMATICALLY_ASSIGN_REVIEWERS:
@@ -51,7 +52,7 @@ class RevisionStateMachine(StateMachine):
                 review = Review(
                     revision=rev, 
                     reviewer=reviewer,
-                    date_due=datetime.now() + timedelta(days=settings.DAYS_TO_REVIEW)
+                    date_due=timezone.now() + timedelta(days=settings.DAYS_TO_REVIEW)
                 )
                 review.save()
                 notify_user_when_review_created(review)
@@ -66,9 +67,9 @@ class RevisionStateMachine(StateMachine):
         self.log_state_transition(rev, old_state, new_state)
         self.flash_authors(rev, "{} has been withdrawn and will not be reviewed.".format(rev.title))
         rev.status = new_state
-        rev.date_decided = datetime.now()
+        rev.date_decided = timezone.now()
         rev.save()
-        review_state_machine = ReviewStateMachine()
+        review_state_machine = ReviewStateMachine(self.request)
         for review in rev.reviews.filter(status=Review.StatusChoices.ASSIGNED).all():
             review_state_machine.transition(review, Review.StatusChoices.WITHDRAWN)
 
@@ -88,15 +89,26 @@ class RevisionStateMachine(StateMachine):
         self.log_state_transition(rev, old_state, new_state)
         self.flash_authors("{} has been published!".format(rev.title))
         rev.status = new_state
-        rev.date_published = datetime.now()
+        rev.date_published = timezone.now()
         rev.save()
 
     def _decision_transition(self, rev, old_state, new_state):
         self.log_state_transition(rev, old_state, new_state)
-        self.flash_authors("{} has reviews and a decision.".format(rev.title))
+        self.flash_authors(rev, "{} has reviews and a decision.".format(rev.title))
         rev.status = new_state
-        rev.date_decided = datetime.now()
+        rev.date_decided = timezone.now()
         rev.save()
+        review_state_machine = ReviewStateMachine(self.request) 
+        for review in rev.reviews.all():
+            print("TRANSITIONING... MANUSCRIPT DECIDED", review)
+            if review.status in [Review.StatusChoices.ASSIGNED, Review.StatusChoices.EDIT_REQUESTED]:
+                if review.date_due < timezone.now():
+                    review_state_machine.transition(review, Review.StatusChoices.EXPIRED)
+                else:
+                    print("  > NOT NEEDED")
+                    review_state_machine.transition(review, Review.StatusChoices.NOT_NEEDED)
+            elif review.status == Review.StatusChoices.SUBMITTED:
+                review_state_machine.transition(review, Review.StatusChoices.COMPLETE)
         notify_user_revision_transitioned_from_pending_to_decided(rev)
 
     def log_state_transition(self, rev, old_state, new_state):
@@ -112,7 +124,10 @@ class RevisionStateMachine(StateMachine):
 
     def flash_authors(self, rev, message, level=messages.INFO):
         "Sets a flash message if the current user is an author of the revision"
-        if self.request and self.request.user in rev.manuscript.authors.all():
+        if self.request and (
+            self.request.user in rev.manuscript.authors.all() or
+            self.request.user.profile.is_editor
+        ):
             messages.add_message(self.request, level, message)
             
     transitions = {

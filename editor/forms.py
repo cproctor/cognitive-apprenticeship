@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
 from author.models import Manuscript, Revision
+from reviewer.models import Review
+from tinymce.widgets import TinyMCE
 from .models import JournalIssue
 
 class AssignReviewerForm(forms.Form):
@@ -40,3 +42,18 @@ class EditJournalIssueForm(forms.ModelForm):
     class Meta:
         model = JournalIssue
         fields = ['title', 'introduction', 'volume', 'number', 'published', 'manuscripts']
+
+class EditorialReviewForm(forms.ModelForm):
+    editorial_review = forms.CharField(widget=TinyMCE())
+
+    class Meta:
+        model = Revision
+        fields = ['editorial_review']
+
+class EditorialDecisionForm(forms.ModelForm):
+    """Allows the editor to issue a decision. 
+    Uses Review.recommendation for convenience.
+    """
+    class Meta:
+        model = Review
+        fields = ['recommendation']

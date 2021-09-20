@@ -2,8 +2,20 @@
 
 {% block content %}
 <h1>LAI 615 Journal</h1>
-{% if articles %}
-<p>ARTICLES!</p>
+{% if issues %}
+  {% for issue in issues %}
+    <h2>{{issue.title}}</h2>
+    <p class="explanation">
+      Volume {{issue.volume}}, Issue {{issue.number}}.
+      Edited by {{editor_names}}.
+    </p>
+    {{issue.introduction|safe}}
+    {% for m in issue.manuscripts.all %}
+      <h3>{{m.short_title}}</h3>
+      <p class="explanation">by {{m.author_names}}</p>
+      {{m.revisions.last.text|safe}}
+    {% endfor %}
+  {% endfor %}
 {% else %}
 	<p>No articles have been published yet in this journal.
 {% endif %}

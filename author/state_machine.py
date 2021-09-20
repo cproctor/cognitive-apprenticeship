@@ -90,7 +90,7 @@ class RevisionStateMachine(StateMachine):
 
     def accept_to_published(self, rev, old_state, new_state):
         self.log_state_transition(rev, old_state, new_state)
-        self.flash_authors("{} has been published!".format(rev.title))
+        self.flash_authors(rev, "{} has been published!".format(rev.title))
         rev.status = new_state
         rev.date_published = timezone.now()
         rev.save()

@@ -119,3 +119,12 @@ article.revision {
 .decision {
   font-style: italic;
 }
+.journal-issue-summary {
+  border: 1px solid black;
+  border-radius: 4px;
+  padding: 4px;
+  margin: 8px;
+}
+.title {
+  font-style: italic;
+}

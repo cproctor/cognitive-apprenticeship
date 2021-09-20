@@ -8,3 +8,9 @@ class JournalIssue(models.Model):
     date_published = models.DateTimeField(blank=True, null=True)
     manuscripts = models.ManyToManyField('author.Manuscript', related_name='issues', blank=True)
     published = models.BooleanField(default=False, blank=True)
+
+    def __str__(self):
+        return "{} (Vol {}, Number {})".format(self.title, self.volume, self.number)
+
+    class Meta:
+        ordering = ('-volume', '-number')

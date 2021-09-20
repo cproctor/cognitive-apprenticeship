@@ -195,6 +195,15 @@ class EditIssue(EditorRoleRequiredMixin, UpdateView):
     form_class = EditJournalIssueForm
     template_name = "editor/edit_issue.html"
     context_object_name = "issue"
+
+    def post(self, request, *args, **kwargs):
+        result = super().post(request, *args, **kwargs)
+        sm = RevisionStateMachine(request)
+        for manuscript in self.get_object().manuscripts.all():
+            revision = manuscript.revisions.last()
+            if revision.status == Revision.StatusChoices.ACCEPT:
+                sm.transition(revision, sm.states.PUBLISHED)
+        return result
     
     def get_success_url(self):
         return reverse('editor:show_issue', args=(self.object.id,))

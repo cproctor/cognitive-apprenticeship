@@ -6,11 +6,12 @@
 <ul>
   {% for issue in issues %}
     <li>
-      <a href="{% url 'editor:show_issue' issue.id %}">{{issue.title}}</a>
+      <a href="{% url 'editor:show_issue' issue.id %}">{{issue.title}}</a> 
+      (Vol {{issue.volume}}, Number {{issue.number}})
       <ul>
         {% for m in issue.manuscripts.all %}
           <li>
-            {{m.short_title}}
+            {{m}}
           </li>
         {% endfor %}
       </ul>

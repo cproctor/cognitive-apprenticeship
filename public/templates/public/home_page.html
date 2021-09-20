@@ -14,7 +14,8 @@
         </p>
         {{issue.introduction|safe}}
         {% for m in issue.manuscripts.all %}
-          <h3>{{m.short_title}}</h3>
+          <hr>
+          <h2>{{m.short_title}}</h2>
           <p class="explanation">by {{m.author_names}}</p>
           {{m.revisions.last.text|safe}}
         {% endfor %}

@@ -36,7 +36,19 @@
     {% if review.status == "ASSIGNED" %}
       <p class="explanation">Review is due by {{review.date_due}}</p>
     {% elif review.status == "SUBMITTED" %}
-      <p class="explanation">Status: Submitted</p>
+      <p class="explanation">Recommendation: {{review.recommendation}}</p>
+      {{review.text|safe}}
+    {% elif review.status == "COMPLETE" %}
+      <p class="explanation">Recommendation: {{review.recommendation}}</p>
+      {{review.text|safe}}
+    {% elif review.status == "EXPIRED" %}
+      <p class="explanation">Review not submitted in time.</p>
+    {% elif review.status == "WITHDRAWN" %}
+      <p class="explanation">The revision was withdrawn.</p>
+    {% elif review.status == "NOT_NEEDED" %}
+      <p class="explanation">Editorial decision made before review was submitted.</p>
+    {% elif review.status == "EDIT_REQUESTED" %}
+      <p class="explanation">Editor requested edits to this review.</p>
       <p class="explanation">Recommendation: {{review.recommendation}}</p>
       {{review.text|safe}}
     {% endif %}

@@ -9,6 +9,7 @@
   </p>
   {{issue.introduction|safe}}
   {% for m in issue.manuscripts.all %}
+    <hr>
     <h2>{{m.short_title}}</h2>
     <p class="title">by {{m.author_names}}</p>
     {{m.revisions.last.text|safe}}

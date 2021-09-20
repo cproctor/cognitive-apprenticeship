@@ -1,6 +1,7 @@
 {% extends "editor/base.html" %}
 
 {% block content %}
+<div id="main-content-container">
 <h1>Issues</h1>
 <ul>
   {% for issue in issues %}
@@ -17,4 +18,5 @@
   {% endfor %}
   <li><a href="{% url 'editor:new_issue' %}">Create new issue</a></li>
 </ul>
+</div>
 {% endblock %}

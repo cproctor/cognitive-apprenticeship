@@ -10,6 +10,9 @@ body {
 #main-content {
 	flex: 1;
 }
+#main-content-container {
+  padding: 0 8px;
+}
 #footer {
   background-color: grey;
 	display: flex;

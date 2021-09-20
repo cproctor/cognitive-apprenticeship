@@ -1,6 +1,7 @@
 {% extends "author/base.html" %}
 
 {% block content %}
+<div id="main-content-container">
 <h1>Your manuscripts</h1>
 
 <div class="process-chart">
@@ -33,5 +34,6 @@
       {% include "author/partials/manuscript_cell.html" %}
     {% endfor %}
   </div>
+</div>
 </div>
 {% endblock %}

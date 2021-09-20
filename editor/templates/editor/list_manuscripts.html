@@ -1,6 +1,7 @@
 {% extends "editor/base.html" %}
 
 {% block content %}
+<div id="main-content-container">
 <h1>Manuscripts</h1>
 <form method="get" action="{% url 'editor:list_manuscripts' %}">
   <input type="text" name="q">
@@ -29,6 +30,7 @@
 		  {% include "editor/partials/manuscript_cell.html" %}
 		{% endfor %}
 	</div>
+</div>
 </div>
 {% endblock %}
 

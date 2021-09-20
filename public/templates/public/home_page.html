@@ -1,6 +1,7 @@
 {% extends "public/base.html" %}
 
 {% block content %}
+<div id="main-content-container">
 <h1>LAI 615 Journal</h1>
 {% if issues %}
   {% for issue in issues %}
@@ -19,5 +20,5 @@
 {% else %}
 	<p>No articles have been published yet in this journal.
 {% endif %}
-
+</div>
 {% endblock %}

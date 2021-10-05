@@ -43,10 +43,11 @@ class RevisionStateMachine(StateMachine):
         rev.date_submitted = timezone.now()
         rev.save()
         notify_user_revision_transitioned_from_unsubmitted_to_pending(rev)
-        if settings.AUTOMATICALLY_ASSIGN_REVIEWERS and not rev.has_prior_decision():
-            reviewers = ranked_reviewers(rev.manuscript.authors.all())
-            if len(reviewers) >= settings.NUMBER_OF_REVIEWERS:
-                rev.manuscript.reviewers.add(*reviewers[:settings.NUMBER_OF_REVIEWERS])
+        if settings.AUTOMATICALLY_ASSIGN_REVIEWERS:
+            num_reviewers_needed = max(0, settings.NUMBER_OF_REVIEWERS - rev.manuscript.reviewers.count())
+            reviewer_pool = ranked_reviewers(rev.manuscript.authors.all(), rev.manuscript.reviewers.all())
+            if len(reviewer_pool) >= num_reviewers_needed:
+                rev.manuscript.reviewers.add(*reviewer_pool[:num_reviewers_needed])
             else:
                 msg = "Not enough reviewers for manuscript {}".format(rev.manuscript_id)
                 main_logger.warning("Not enough reviewers for manuscript {}".format(rev.manuscript_id))

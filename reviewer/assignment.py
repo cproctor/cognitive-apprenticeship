@@ -1,11 +1,14 @@
 from math import log
 from django.contrib.auth.models import User
 
-def ranked_reviewers(authors):
+def ranked_reviewers(authors, existing_reviewers=None):
     "Returns a list of possible reviewers, sorted by score"
     author_ids = [author.id for author in authors]
-    candidates = User.objects.filter(profile__is_reviewer=True).exclude(id__in=author_ids).all()
-    return sorted(candidates, key=lambda c: reviewer_heuristic(authors, c), reverse=True)
+    candidates = User.objects.filter(profile__is_reviewer=True).exclude(id__in=author_ids)
+    if existing_reviewers:
+        existing_reviewer_ids = [r.id for r in existing_reviewers]
+        candidates = candidates.exclude(id__in=existing_reviewer_ids)
+    return sorted(candidates.all(), key=lambda c: reviewer_heuristic(authors, c), reverse=True)
 
 def reviewer_heuristic(authors, potential_reviewer):
     "Returns a score for an (author, reviewer) pair"

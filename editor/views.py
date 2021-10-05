@@ -16,7 +16,6 @@ from editor.forms import (
     EditorialReviewForm,
     EditorialDecisionForm
 )
-from datetime import datetime, timedelta
 from .models import JournalIssue
 from .forms import NewJournalIssueForm, EditJournalIssueForm
 from reviewer.email import notify_user_when_review_created
@@ -85,34 +84,6 @@ class ShowRevision(EditorRoleRequiredMixin, ManuscriptRevisionMixin, DetailView)
             msg = "Waiting on authorship acknowledgement: {}"
             c['missing_authors_message'] = msg.format(m.format_names(missing_authors))
         return c
-
-    # TODO This belongs somewhere else...
-    def post(self, request, *args, **kwargs):
-        manuscript = self.get_object()
-        context = self.get_context_data()
-        action = request.POST['action'].upper()
-        if action.upper() == 'ASSIGN_REVIEWER':
-            form = AssignReviewerForm(manuscript, request.POST)
-            if form.is_valid():
-                user = form.cleaned_data['reviewer']
-                manuscript.reviewers.add(user)
-                if not Review.objects.filter(revision__manuscript=manuscript, reviewer=user).exists():
-                    review = Review.objects.create(
-                        reviewer=user,
-                        revision=manuscript.revisions.last(),
-                        status=Review.StatusChoices.ASSIGNED,
-                        date_due=datetime.now() + timedelta(days=settings.DAYS_TO_REVIEW)
-                    )
-                    notify_user_when_review_created(review)
-                return redirect('editor:show_manuscript', manuscript.id)
-            else:
-                context['assign_reviewer_form'] = form
-                return render(request, self.template_name, context)
-        elif action.upper() == 'REMOVE_REVIEWER':
-            user = manuscript.reviewers.get(username=request.POST['username'])
-            Review.objects.filter(revision__manuscript=manuscript, reviewer=user).delete()
-            manuscript.reviewers.remove(user)
-            return redirect('editor:show_manuscript', manuscript.id)
 
 class ShowRevisionReviews(EditorRoleRequiredMixin, ManuscriptRevisionMixin, DetailView):
     model = Revision

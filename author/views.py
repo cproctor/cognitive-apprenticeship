@@ -1,4 +1,3 @@
-from datetime import datetime
 from django.db import transaction, DatabaseError
 from django.http import HttpResponseForbidden
 from django.views.generic.base import TemplateView
@@ -8,6 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, FormView
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.contrib import messages
+from django.utils import timezone
 from .models import Manuscript, ManuscriptAuthorship, Revision
 from .forms import NewManuscriptForm, EditRevisionForm, EditResubmittedRevisionForm
 from .state_machine import RevisionStateMachine
@@ -50,7 +50,7 @@ class NewManuscript(AuthorMixin, FormView):
                         revision_number=0,
                         title=form.cleaned_data['title'],
                         text=form.cleaned_data['text'],
-                        date_created=datetime.now(),
+                        date_created=timezone.now(),
                     )
                     if manuscript.has_unacknowledged_authors():
                         sm = RevisionStateMachine()

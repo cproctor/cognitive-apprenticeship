@@ -103,8 +103,8 @@ class ShowRevision(AuthorMixin, ManuscriptRevisionMixin, DetailView):
             )
             c['missing_authors_message'] = missing_msg.format(m.format_names(missing_authors))
             c['withdrawal_forbidden_because_reviews_underway'] = (
-                r.status == r.StatusChoices.PENDING and 
-                r.has_reviews_underway()
+                revision.status == revision.StatusChoices.PENDING and 
+                revision.has_reviews_underway()
             )
         return c
 

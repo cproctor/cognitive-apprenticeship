@@ -2,25 +2,9 @@
 
 {% block content %}
 <div id="main-content-container" class="journal-issue-container">
-<h1>LAI 615 Journal</h1>
-{% if issues %}
-  {% for issue in issues %}
-    {% if forloop.counter == 1 %}
-      <div class="journal-issue-summary">
-        <h2><a href="{% url 'public:show_issue' issue.id %}">{{issue.title}}</a></h2>
-        <p class="explanation">
-          Volume {{issue.volume}}, Issue {{issue.number}}.
-          Edited by {{editor_names}}.
-        </p>
-        {{issue.introduction|safe}}
-        {% for m in issue.manuscripts.all %}
-          <hr>
-          <h2>{{m.short_title}}</h2>
-          <p class="explanation">by {{m.author_names}}</p>
-          {{m.revisions.last.text|safe}}
-        {% endfor %}
-      </div>
-    {% else %}
+  <h1>LAI 615 Journal</h1>
+  {% if issues %}
+    {% for issue in issues %}
       <div class="journal-issue-summary">
         <h3><a href="{% url 'public:show_issue' issue.id %}">{{issue.title}}</a></h3>
         <p class="explanation">
@@ -32,10 +16,10 @@
             <li><span class="explanation">{{m.short_title}}</span> by {{m.author_names}}</li>
           {% endfor %}
         </ul>
-    {% endif %}
-  {% endfor %}
-{% else %}
-	<p>No articles have been published yet in this journal.
-{% endif %}
+      </div> 
+    {% endfor %}
+  {% else %}
+	<p>No articles have been published yet in this journal.</p>
+  {% endif %}
 </div>
 {% endblock %}

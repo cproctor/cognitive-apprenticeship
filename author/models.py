@@ -78,7 +78,7 @@ class ManuscriptAuthorship(models.Model):
     acknowledged = models.BooleanField(default=False)
 
 class Revision(models.Model):
-    timeformat = "%A %B %-m, %Y at %-I:%M %p"
+    timeformat = "%A %B %-d, %Y at %-I:%M %p"
 
     class StatusChoices(models.TextChoices):
         UNSUBMITTED = 'UNSUBMITTED', 'Unsubmitted'

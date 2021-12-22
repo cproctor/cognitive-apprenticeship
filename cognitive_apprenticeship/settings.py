@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tinymce',
+    'django_distill',
     'roles', 
     'public', 
     'author',
@@ -207,3 +208,13 @@ JOURNAL_EMAIL_SENDER = "chris.proctor@gmail.com"
 JOURNAL_EMAIL_BASE_URL = "https://cisljournal.net"
 
 EMAIL_SUBJECT_PREFIX = "[CISL Journal] "
+
+SITE_FROZEN = False
+DISTILL_PUBLISH = {
+    'default': {
+        'ENGINE': 'django_distill.backends.amazon_s3',
+        'PUBLIC_URL': 'https://cisljournal.net',
+        'ACCESS_KEY_ID': '...',
+        'SECRET_ACCESS_KEY': '...',
+    }
+}

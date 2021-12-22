@@ -9,6 +9,7 @@ python = "^3.9"
 Django = "^3.2.6"
 django-tinymce = "^3.3.0"
 django-crispy-forms = "^1.12.0"
+django-distill = "^2.9.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

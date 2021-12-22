@@ -1,8 +1,11 @@
+{% load settings %}
+{% settings_value "SITE_FROZEN" as SITE_FROZEN %}
 <nav id="menu">
 	<div class="menu-left">
 		<div class="menu-item{% if menu_section == 'public' %} current{% endif %}">
       <a href="{% url 'public:home_page' %}">Home</a>
     </div>
+      {% if not SITE_FROZEN %}
 		{% if user.is_authenticated %}
 		  {% if user.profile.is_author %}
 		    <div class="menu-item {% if menu_section == 'author' %} current{% endif %}">
@@ -33,5 +36,6 @@
 		{% else %}
 		  <div class="menu-item"><a href="{% url 'login' %}">Log in</a></div>
 		{% endif %}
+	  {% endif %}
 	</div>
 </nav>

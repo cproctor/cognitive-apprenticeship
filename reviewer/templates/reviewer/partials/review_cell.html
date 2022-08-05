@@ -3,6 +3,10 @@
     <a href="{% url 'reviewer:show_manuscript' review.revision.manuscript.id %}">{{review.revision.title}}</a></p>
     {% if review.kanban_column.name == "ASSIGNED" %}
       <p>Due {{review.date_due}}</p>
+    {% elif review.status == "NOT_NEEDED" %}
+      <p>No review needed; the editor issued a decision before your review was due.</p>
+    {% elif review.status == "WITHDRAWN" %}
+      <p>No review needed; the author withdrew their manuscript.</p>
     {% else %}
       <p>Submitted {{review.date_submitted}}</p>
     {% endif %}

@@ -1,4 +1,5 @@
 from common.state_machine import StateMachine
+from common.due_date import due_date
 from django.contrib import messages
 from django.conf import settings
 from datetime import datetime, timedelta
@@ -53,11 +54,8 @@ class RevisionStateMachine(StateMachine):
                 main_logger.warning("Not enough reviewers for manuscript {}".format(rev.manuscript_id))
         for reviewer in rev.manuscript.reviewers.all():
             if not rev.reviews.filter(reviewer=reviewer).exists():
-                review = Review(
-                    revision=rev, 
-                    reviewer=reviewer,
-                    date_due=timezone.now() + timedelta(days=settings.DAYS_TO_REVIEW)
-                )
+                review = Review(revision=rev, reviewer=reviewer, 
+                        date_due=due_date(settings.DAYS_TO_REVIEW))
                 review.save()
                 notify_user_when_review_created(review)
 
@@ -104,12 +102,10 @@ class RevisionStateMachine(StateMachine):
         rev.save()
         review_state_machine = ReviewStateMachine(self.request) 
         for review in rev.reviews.all():
-            print("TRANSITIONING... MANUSCRIPT DECIDED", review)
             if review.status in [Review.StatusChoices.ASSIGNED, Review.StatusChoices.EDIT_REQUESTED]:
                 if review.date_due < timezone.now():
                     review_state_machine.transition(review, Review.StatusChoices.EXPIRED)
                 else:
-                    print("  > NOT NEEDED")
                     review_state_machine.transition(review, Review.StatusChoices.NOT_NEEDED)
             elif review.status == Review.StatusChoices.SUBMITTED:
                 review_state_machine.transition(review, Review.StatusChoices.COMPLETE)

@@ -1,4 +1,5 @@
 from common.state_machine import StateMachine
+from common.due_date import due_date
 from django.contrib import messages
 from django.conf import settings
 from django.utils import timezone
@@ -61,7 +62,7 @@ class ReviewStateMachine(StateMachine):
         msg = "The editor requested that you edit your review."
         self.flash_authors(rev, msg.format(rev.title))
         rev.status = new_state
-        rev.date_due = timezone.now() + timedelta(days=settings.DAYS_TO_EDIT_REVIEW)
+        rev.date_due = due_date(settings.DAYS_TO_EDIT_REVIEW)
         rev.save()
 
     def expired_to_assigned(self, rev, old_state, new_state):
@@ -69,7 +70,7 @@ class ReviewStateMachine(StateMachine):
         msg = "The editor extended the deadline for an expired review."
         self.flash_authors(rev, msg)
         rev.status = new_state
-        rev.date_due = timezone.now() + timedelta(days=settings.DAYS_ON_EXTENSION) 
+        rev.date_due = due_date(settings.DAYS_ON_EXTENSION) 
         rev.date_complete = None
         rev.save()
 

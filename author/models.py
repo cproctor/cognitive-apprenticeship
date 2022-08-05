@@ -141,7 +141,7 @@ class Revision(models.Model):
         elif self.status == self.StatusChoices.PUBLISHED:
             verb = "published"
             ts = self.date_published
-        return "{} {}".format(verb.capitalize(), ts.strftime(self.timeformat))
+        return "{} {}".format(verb.capitalize(), timezone.localtime(ts).strftime(self.timeformat))
 
     def status_message_for_reviewers(self):
         if self.status == self.StatusChoices.PENDING:

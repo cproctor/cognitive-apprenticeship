@@ -150,15 +150,10 @@ LOGGING = {
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
+TIME_ZONE = 'America/New_York'
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
@@ -196,7 +191,8 @@ TINYMCE_DEFAULT_CONFIG = {
 
 JOURNAL_NAME = "LAI 615 Journal"
 EDITOR_NAMES = "Dr. Chris Proctor"
-DAYS_TO_REVIEW = 5
+DUE_DATE_HOUR = 1 # UTC
+DAYS_TO_REVIEW = 6
 DAYS_TO_EDIT_REVIEW = 3
 DAYS_ON_EXTENSION = 1
 NUMBER_OF_REVIEWERS = 2

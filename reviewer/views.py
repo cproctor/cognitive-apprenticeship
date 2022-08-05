@@ -19,7 +19,7 @@ class ReviewerHome(ReviewerMixin, TemplateView):
 
     def get_context_data(self):
         c = super().get_context_data()
-        my_reviews = Review.objects.filter(reviewer=self.request.user)..all()
+        my_reviews = Review.objects.filter(reviewer=self.request.user).all()
         for col, reviews in Review.in_kanban_columns(my_reviews).items():
             c[col.name] = reviews
         return c

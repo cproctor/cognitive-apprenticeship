@@ -16,7 +16,16 @@
 	color: white;
 	text-decoration: none;
 }
-
+#menu .menu-item.clickable:hover {
+  background-color: #999;
+}
+#menu .menu-item.current {
+  background-color: #bbb;
+}
+#menu .menu-item.current a {
+  color: black;
+}
+/* SUBMENU */
 #submenu {
   background-color: #bbb;
 	display: flex;
@@ -24,10 +33,4 @@
 #submenu a {
 	color: white;
 	text-decoration: none;
-}
-.menu-item.current {
-  background-color: #eee;
-}
-#menu .menu-item.current a {
-  color: black;
 }

@@ -2,28 +2,28 @@
 {% settings_value "SITE_FROZEN" as SITE_FROZEN %}
 <nav id="menu">
 	<div class="menu-left">
-		<div class="menu-item{% if menu_section == 'public' %} current{% endif %}">
+		<div class="menu-item clickable{% if menu_section == 'public' %} current{% endif %}">
       <a href="{% url 'public:home_page' %}">Home</a>
     </div>
       {% if not SITE_FROZEN %}
 		{% if user.is_authenticated %}
 		  {% if user.profile.is_author %}
-		    <div class="menu-item {% if menu_section == 'author' %} current{% endif %}">
+		    <div class="menu-item  clickable{% if menu_section == 'author' %} current{% endif %}">
           <a href="{% url 'author:home' %}">Author</a>
         </div>
 			{% endif %}
 		  {% if user.profile.is_reviewer %}
-      <div class="menu-item{% if menu_section == 'reviewer' %} current{% endif %}">
+      <div class="menu-item clickable{% if menu_section == 'reviewer' %} current{% endif %}">
         <a href="{% url 'reviewer:home' %}">Reviewer</a>
       </div>
 			{% endif %}
 		  {% if user.profile.is_editor %}
-		    <div class="menu-item{% if menu_section == 'editor' %} current{% endif %}">
+		    <div class="menu-item clickable{% if menu_section == 'editor' %} current{% endif %}">
           <a href="{% url 'editor:home' %}">Editor</a>
         </div>
 			{% endif %}
 		  {% if user.is_superuser %}
-		    <div class="menu-item">
+		    <div class="menu-item clickable">
           <a href="{% url 'admin:index' %}">Admin</a>
         </div>
 			{% endif %}
@@ -32,9 +32,9 @@
 	<div class="menu-right">
 		{% if user.is_authenticated %}
 		  <div class="menu-item">Logged in as {{user.username}}</div>
-		  <div class="menu-item"><a href="{% url 'logout' %}">Log out</a></div>
+		  <div class="menu-item clickable"><a href="{% url 'logout' %}">Log out</a></div>
 		{% else %}
-		  <div class="menu-item"><a href="{% url 'login' %}">Log in</a></div>
+		  <div class="menu-item clickable"><a href="{% url 'login' %}">Log in</a></div>
 		{% endif %}
 	  {% endif %}
 	</div>

@@ -24,4 +24,5 @@ urlpatterns = [
     path('author/', include('author.urls')),
     path('reviewer/', include('reviewer.urls')),
     path('editor/', include('editor.urls')),
+    path('profile/', include('roles.urls')),
 ]

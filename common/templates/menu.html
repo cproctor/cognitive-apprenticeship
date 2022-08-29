@@ -31,7 +31,9 @@
 	</div>
 	<div class="menu-right">
 		{% if user.is_authenticated %}
-		  <div class="menu-item">Logged in as {{user.username}}</div>
+        <div class="menu-item clickable{% if menu_section == 'profile' %} current{% endif %}">
+              <a href="{% url 'roles:detail' %}">{{user.username}}</a>
+          </div>
 		  <div class="menu-item clickable"><a href="{% url 'logout' %}">Log out</a></div>
 		{% else %}
 		  <div class="menu-item clickable"><a href="{% url 'login' %}">Log in</a></div>

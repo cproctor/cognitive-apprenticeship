@@ -54,6 +54,7 @@ cd /opt/lai615/cognitive-apprenticeship/cognitive_apprenticeship/
   from django.core.management.utils import get_random_secret_key  
   get_random_secret_key()
   ```
+- `ALLOWED_HOSTS=['localhost', 'cisljournal.net']`
 - `STATIC_ROOT="/opt/lai615/static_root"`
 - Configure logging (`cognitive_apprenticeship/deploy/settings_logging.py`)
 
@@ -66,10 +67,12 @@ cd /opt/lai615/cognitive-apprenticeship/
 pip install -r requirements.txt
 ```
 
-Migrate database
+Setup tasks
 
 ```
+./manage.py collectstatic
 ./manage.py migrate
+deactivate
 ```
 
 ### Services
@@ -84,9 +87,12 @@ sudo systemctl status gunicorn615
 
 ### Networking
 
-- Configure nginx (starting from `cognitive_apprenticeship/deploy/nginx.conf`)
+```
+sudo cp nginx.conf /etc/nginx/nginx.conf
+sudo systemctl enable nginx
+sudo systemctl start nginx
+sudo systemctl status nginx
+```
 
 
-### Prepare apps
-
-sudo chown -R www-data:www-data /opt
+- Set debug to False

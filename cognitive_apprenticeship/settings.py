@@ -111,6 +111,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+ADMINS = [
+    ('Chris', 'cisljournal.net@accounts.chrisproctor.net'),
+]
+
 LOGGING = {
     'version': 1,
     'formatters': {

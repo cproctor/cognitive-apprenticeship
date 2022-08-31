@@ -25,4 +25,5 @@ urlpatterns = [
     path('reviewer/', include('reviewer.urls')),
     path('editor/', include('editor.urls')),
     path('profile/', include('roles.urls')),
+    path('test/', include('common.urls')),
 ]

@@ -47,7 +47,6 @@ Configure app settings.
 
 ```
 cd /opt/lai615/cognitive-apprenticeship/cognitive_apprenticeship/
-mv settings.py settings_production.py
 ```
 
 - Generate secret key
@@ -67,14 +66,21 @@ cd /opt/lai615/cognitive-apprenticeship/
 pip install -r requirements.txt
 ```
 
+Migrate database
+
+```
+./manage.py migrate
+```
+
 ### Services
 
 ```
 cd /opt/lai615/cognitive-apprenticeship/cognitive_apprenticeship/deploy
-sudo cp gunicorn.socket gunicorn.service /etc/systemd/system/
+sudo cp gunicorn615.socket gunicorn615.service /etc/systemd/system/
+sudo chown -R www-data:www-data /opt/lai615
+sudo systemctl start gunicorn615
+sudo systemctl status gunicorn615
 ```
-
-- Create `.sock` and `.service` files (starting from `cognitive_apprenticeship/gunicorn615.*`)
 
 ### Networking
 

@@ -160,9 +160,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "static_root"
-STATICFILES_DIRS = [
-    BASE_DIR / 'cognitive_apprenticeship' / 'static',
-]
 TINYMCE_JS_URL = STATIC_URL + "/js/tinymce/tinymce.min.js"
 #TINYMCE_JS_ROOT = str(STATIC_ROOT / "js" / "tinymce")
 #TINYMCE_COMPRESSOR = False

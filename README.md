@@ -56,6 +56,15 @@ cd /opt/lai615/cognitive-apprenticeship/cognitive_apprenticeship/
   ```
 - `ALLOWED_HOSTS=['localhost', 'cisljournal.net']`
 - `STATIC_ROOT="/opt/lai615/static_root"`
+- Email: 
+  ```
+  EMAIL_HOST = "smtp.fastmail.com"
+  EMAIL_PORT = 465
+  EMAIL_USE_SSL = True
+  EMAIL_HOST_USER = "chris@chrisproctor.net"
+  EMAIL_HOST_PASSWORD = "..."
+  ```
+  
 - Configure logging (`cognitive_apprenticeship/deploy/settings_logging.py`)
 
 Install dependencies

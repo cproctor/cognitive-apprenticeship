@@ -11,6 +11,7 @@ django-tinymce = "^3.3.0"
 django-crispy-forms = "^1.12.0"
 django-distill = "^2.9.2"
 JSON-log-formatter = "^0.5.1"
+gunicorn = "^20.1.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

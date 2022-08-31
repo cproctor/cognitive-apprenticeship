@@ -1,0 +1,26 @@
+# /etc/systemd/system/gunicorn615.service
+
+[Unit]
+Description=gunicorn 615 daemon
+Requires=gunicorn615.socket
+After=network.target
+
+[Service]
+Type=notify
+User=www-data
+Group=www-data
+RuntimeDirectory=gunicorn
+WorkingDirectory=/opt/lai615/cognitive-apprenticeship/
+ExecStart=/opt/lai615/env/bin/gunicorn \
+  --bind unix:/opt/lai615/gunicorn615.sock \
+  --access-logfile /var/log/gunicorn/gunicorn615-access.log \
+  --error-logfile /var/log/gunicorn/gunicorn615-error.log \
+  --log-level debug\
+  cognitive_apprenticeship.wsgi
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

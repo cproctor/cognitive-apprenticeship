@@ -1,0 +1,11 @@
+# /etc/systemd/system/gunicorn615.socket
+
+[Unit]
+Description=gunicorn 615 socket
+
+[Socket]
+ListenStream=/opt/lai615/gunicorn615.sock
+SocketUser=www-data
+
+[Install]
+WantedBy=sockets.target
